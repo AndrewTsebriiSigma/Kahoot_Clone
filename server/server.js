@@ -15,12 +15,13 @@ const client = new MongoClient(mongoUri, {
   useUnifiedTopology: true 
 });
 
-let quizzesCollection;
+let quizzesCollection, usersCollection;
 
 client.connect().then(() => {
   console.log("Connected to MongoDB");
   const db = client.db("quizApp"); 
-  carsCollection = db.collection("quizzes"); 
+  quizzesCollection = db.collection("quizzes"); 
+  usersCollection = db.collection("users");
 });
 
 // add a new quiz
