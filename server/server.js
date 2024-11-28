@@ -2,6 +2,8 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const app = express();
 const port = process.env.PORT || 5000; 
@@ -10,6 +12,7 @@ app.use(express.json());
 app.use(cors( {origin: 'http://localhost:5173' }));
 
 const mongoUri = process.env.MONGO_URI; 
+const secret_key = process.env.JWT_SECRET;
 const client = new MongoClient(mongoUri, { 
   useNewUrlParser: true, 
   useUnifiedTopology: true 
@@ -22,6 +25,35 @@ client.connect().then(() => {
   const db = client.db("quizApp"); 
   quizzesCollection = db.collection("quizzes"); 
   usersCollection = db.collection("users");
+});
+
+// Registration Route
+app.post("/register", async (req, res) => {
+  const { username, email, password, role } = req.body;
+  // Check for existing user
+  if (users.some(user => user.email === email || user.username === username)) {
+    return res.status(400).json("Email or Username is already taken.");
+  }
+  // Save new user with hashed password
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await usersCollection.insertOne({ username, email, password: hashedPassword, role });
+  res.status(201).json("User registered successfully");
+});
+
+// Login Route
+app.post("/login", async (req, res) => {
+  const { email, password, role } = req.body;
+  const user = await usersCollection.findOne({ email });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(400).json("Invalid credentials");
+  }
+  // Generate and return a JWT token
+  const token = jwt.sign(
+    { username: user.username, email: user.email, role: user.role },
+    secret_key,
+    { expiresIn: "1h" }
+  );
+  res.json({ token });
 });
 
 // add a new quiz
