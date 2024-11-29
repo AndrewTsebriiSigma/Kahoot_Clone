@@ -1,7 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const Results = () => {
+const PassRandomQuizResults = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { score, total } = location.state;
@@ -15,4 +15,4 @@ const Results = () => {
     );
 };
 
-export default Results;
+export default PassRandomQuizResults;

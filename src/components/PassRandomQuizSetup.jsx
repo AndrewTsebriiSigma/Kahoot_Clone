@@ -6,7 +6,7 @@ const PassRandomQuizSetup = () => {
     const navigate = useNavigate();
   
     const startQuiz = () => {
-      navigate('/quiz', { state: { numQuestions } });
+      navigate('/random-quiz', { state: { numQuestions } });
     };
   
     return (

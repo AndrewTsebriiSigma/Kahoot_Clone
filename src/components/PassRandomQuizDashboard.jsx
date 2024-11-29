@@ -7,7 +7,7 @@ const PassRandomQuizDashboard = () => {
     return (
       <div className="container">
         <h1>Welcome to Pass Random Quiz!</h1>
-        <button onClick={() => navigate('/quiz-setup')}>Pass Random Quiz</button>
+        <button onClick={() => navigate('/random-quiz-setup')}>Pass Random Quiz</button>
       </div>
     );
 };
