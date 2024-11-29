@@ -4,13 +4,13 @@ const cors = require('cors');
 require('dotenv').config();
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-<<<<<<< HEAD
+/*<<<<<<< HEAD
 const path = require("path");
 
 
 =======
 >>>>>>> f848c781d19c0b3ea049de871a2565762e3208cd
-
+*/
 const app = express();
 const port = process.env.PORT || 5000; 
 const SECRET_KEY = "comp229secretkey";
