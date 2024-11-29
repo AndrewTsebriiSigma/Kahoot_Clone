@@ -2,6 +2,8 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
+const { Server } = require('socket.io');
+const http = require('http')
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 /*<<<<<<< HEAD
@@ -14,9 +16,17 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 5000; 
 const SECRET_KEY = "comp229secretkey";
+const server = http.createServer(app)
 
 app.use(express.json());
-app.use(cors( {origin: 'http://localhost:5173' }));
+//app.use(cors( {origin: 'http://localhost:5173' }));
+
+// Creating server to check is entered quiz code is valid
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:5173'
+  }
+});
 
 const mongoUri = process.env.MONGO_URI; 
 const secret_key = process.env.JWT_SECRET;
@@ -46,6 +56,23 @@ app.post("/register", async (req, res) => {
   await usersCollection.insertOne({ username, email, password: hashedPassword, role });
   res.status(201).json("User registered successfully");
 });
+
+//Checking if the quizz code is valid
+io.on("connection", (socket) => {
+  console.log(`User is connected: ${socket.id}`);
+
+  socket.on("send_code", (code) => {
+    for (let i = 1; i < quizzesCollection.length; i++) {
+      if (quizzesCollection[i]['Code'] === code) {
+        // useNavigate hook to Lobby.jsx
+        console.log(`${socket.id} was successfully connected to the quiz`);
+      } else {
+        console.log('Failed to access');
+        // Stay in Login.jsx component
+      }
+    }
+  })
+})
 
 // Login Route
 app.post("/login", async (req, res) => {
