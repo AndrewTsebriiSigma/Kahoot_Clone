@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const QuizSetup = () => {
+const PassRandomQuizSetup = () => {
     const [numQuestions, setNumQuestions] = useState(10);
     const navigate = useNavigate();
   
@@ -26,4 +26,4 @@ const QuizSetup = () => {
     );
 };
 
-export default QuizSetup;
+export default PassRandomQuizSetup;
