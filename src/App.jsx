@@ -1,15 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-
+import Login from './components/Login.jsx'
 
 function App () {
   return (
-    <Router>
-      <div>
-        <Routes>
-        </Routes>
-      </div>
-    </Router>
+    <Login></Login>
   );
 };
 
