@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const Dashboard = () => {
+const PassRandomQuizDashboard = () => {
     const navigate = useNavigate();
   
     return (
@@ -12,4 +12,4 @@ const Dashboard = () => {
     );
 };
 
-export default PassRandomQuizDashborad;
+export default PassRandomQuizDashboard;

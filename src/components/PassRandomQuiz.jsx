@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchTriviaQuestions } from '../api/triviaAPI';
 
-const Quiz = () => {
+const PassRandomQuiz = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { numQuestions } = location.state;
