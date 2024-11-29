@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchTriviaQuestions } from '../api/triviaAPI';
 
-const Quiz = () => {
+const PassRandomQuiz = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { numQuestions } = location.state;
@@ -30,7 +30,7 @@ const Quiz = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      navigate('/results', { state: { score, total: questions.length } });
+      navigate('/random-results', { state: { score, total: questions.length } });
     }
   };
 
@@ -56,4 +56,4 @@ const Quiz = () => {
   );
 };
 
-export default Quiz;
+export default PassRandomQuiz;
