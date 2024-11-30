@@ -2,6 +2,8 @@ const express = require('express');
 const { MongoClient, ObjectId } = require('mongodb');
 const cors = require('cors');
 require('dotenv').config();
+const { Server } = require('socket.io');
+const http = require('http')
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 /*<<<<<<< HEAD
@@ -14,9 +16,24 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 5000; 
 const SECRET_KEY = "comp229secretkey";
+const server = http.createServer(app)
 
 app.use(express.json());
-app.use(cors( {origin: 'http://localhost:5173' }));
+
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
+
+
+// Creating server to check is entered quiz code is valid
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST']
+  }
+})
 
 const mongoUri = process.env.MONGO_URI; 
 const secret_key = process.env.JWT_SECRET;
@@ -34,13 +51,33 @@ client.connect().then(() => {
   usersCollection = db.collection("users");
 });
 
-//User Scheema
-const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: { type: String, required: true },
-});
+
+
+//Checking if the quizz code is valid
+io.on("connection", (socket) => {
+  console.log(`User is connected: ${socket.id}`);
+
+  socket.on("send_code", async (code) => {
+    try {
+      const quiz = await db.collection('quizzes').findOne({quizId: code});
+
+      if (quiz && quiz.isValid) {
+        socket.emit('checkQuizCode', { isValid: true});
+      } else {
+        socket.emit('checkQuizCode', {isValid: false});
+      }
+    } catch (err) {
+      console.log(err)
+      socket.emit('checkQuizCode', {isValid: false});
+    }
+  })
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
+  })
+})
+
+
 
 // add a new quiz
 app.post('/api/quizzes', async (req, res) => {
@@ -159,6 +196,17 @@ app.post("/login", async (req, res) => {
     res.status(500).json("Internal server error");
   }
 });
+
+//User Scheema
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, required: true },
+});
+
+const User = mongoose.model("User", userSchema);
+
 
 const mongoose = require("mongoose");
 

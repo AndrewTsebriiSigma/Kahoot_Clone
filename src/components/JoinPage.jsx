@@ -1,11 +1,13 @@
 import { useState, useEffect} from 'react'
+import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
-const socket = io.connect("http://localhost:3001");
 
 function JoinPage() {
     const [code, setCode] = useState('');
     const [nickname, setNickname] = useState('');
     const [quizzes, setQuizzes] = useState(0);
+    const [error, setError] = useState('');
+    const navigate = useNavigate()
     
     // Add Quiz to Quizzes field + transfer user data to another component
     const handleSubmit = async (e) => {
@@ -13,10 +15,18 @@ function JoinPage() {
         setQuizzes(quizzes => quizzes + 1);
     }
 
-    const sendMessage = () => {
-        socket.emit("send_code", {message: code})
+    const joinQuiz = () => {
+        const socket = io("http://localhost:5000");
+        socket.emit("send_code", code);
+
+        socket.on('checkQuizCode', (response) => {
+            if (response.isValid) {
+                navigate(`/lobby/${code}`)
+            } else {
+                setError('Invalid quiz code!');
+            }
+        })
     }
-    
     const openQRWindow = () => {
         alert("User gives access to camera to scan the QR Code") // open a camera to scan QR Code
     }
@@ -41,7 +51,8 @@ function JoinPage() {
                             <input type="text"  placeholder="Enter your nickname" 
                             value={nickname} onChange={(e) =>setNickname(e.target.value)} required />
                         </label>
-                        <button className="joinQuiz" onClick={sendMessage}>Join Quiz</button>
+                        <button className="joinQuiz" onClick={joinQuiz}>Join Quiz</button>
+                        <p>{error}</p>
                     </fieldset>
                 </form>
             </div>
@@ -54,6 +65,8 @@ function JoinPage() {
                     <p>There are no passed quizzes yet!</p>
                 </fieldset>
             </div>
+
+            <button>Pass Random Quiz</button>
         </>
     )
 }

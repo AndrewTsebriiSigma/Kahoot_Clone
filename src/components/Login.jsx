@@ -17,7 +17,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5173/login", {
+      const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),
@@ -28,6 +28,11 @@ const Login = () => {
       if (response.ok) {
         localStorage.setItem("token", data.token);
         alert("Login successful!");
+        if (role === "teacher") {
+          navigate("/quizzes"); // direct to quizzes page
+        } else if (role === "student") {
+          navigate("/join-page"); // direct to join page
+        }
       } else {
         alert(data.message || "Login failed");
       }
@@ -35,6 +40,11 @@ const Login = () => {
       console.error("Error during login:", error);
       alert("An error occurred. Please try again later.");
     }
+  };
+
+  const handleRoleChange = (e) => {
+    const selectedRole = e.target.value;
+    setRole(selectedRole);
   };
 
   return (
@@ -64,7 +74,7 @@ const Login = () => {
               name="role"
               value="teacher"
               checked={role === "teacher"}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={handleRoleChange} 
             />{" "}
             Teacher
           </label>
@@ -74,7 +84,7 @@ const Login = () => {
               name="role"
               value="student"
               checked={role === "student"}
-              onChange={(e) => setRole(e.target.value)}
+              onChange={handleRoleChange}
             />{" "}
             Student
           </label>
