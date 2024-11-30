@@ -35,20 +35,21 @@ io.on("connection", (socket) => {
     console.log(`User is connected: ${socket.id}`);
   
     socket.on("send_code", async (code) => {
-      console.log(code)
+      console.log("Received quiz code:", code);
       try {
-        const quiz = await quizzesCollection.findOne({quizId: code});
-  
+        const quiz = await quizzesCollection.findOne( {quizId: Number(code)} );
+        console.log("Quiz found:", quiz);  // Log the quiz object
+    
         if (quiz && quiz.isValid) {
-          socket.emit('checkQuizCode', { isValid: true});
+          socket.emit('checkQuizCode', { isValid: true });
         } else {
-          socket.emit('checkQuizCode', {isValid: false});
+          socket.emit('checkQuizCode', { isValid: false });
         }
       } catch (err) {
-        console.log(err)
-        socket.emit('checkQuizCode', {isValid: false});
+        console.error("Error querying database:", err);
+        socket.emit('checkQuizCode', { isValid: false });
       }
-    })
+    });
 
     socket.on('disconnect', () => {
         console.log('User disconnected:', socket.id);

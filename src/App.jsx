@@ -22,7 +22,7 @@ function App () {
           <Route path="/register" element={<Registration />} />
           <Route path="/quizzes" element={<Quizzes />} />
           <Route path="/join-page" element={<JoinPage />} />
-          <Route path="/lobby" element={<Lobby/>}/> 
+          <Route path="/lobby/:code" element={<Lobby/>}/> 
           <Route path="/pass-random-quiz" element={<PassRandomQuizDasboard />} />
           <Route path="/random-quiz-setup" element={<PassRandomQuizSetup/>} />
           <Route path="/random-quiz" element={<PassRandomQuiz />} />

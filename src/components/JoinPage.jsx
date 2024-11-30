@@ -18,7 +18,7 @@ function JoinPage() {
 
     const joinQuiz = () => {
         socket = io.connect("http://localhost:3001");
-        socket.emit("send_code", {message: code});
+        socket.emit("send_code",  Number(code));
 
         socket.on('checkQuizCode', (response) => {
             if (response.isValid) {

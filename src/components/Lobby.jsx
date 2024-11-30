@@ -10,7 +10,7 @@ function Lobby() {
         <>
             <div className='roomID'>
                 <p>Join Kahoot Quiz via code</p>
-                <p>111111</p>
+                <p>XXXXXX</p>
             </div>
 
             <div className='counter'>
