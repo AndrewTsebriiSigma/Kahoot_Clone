@@ -60,7 +60,7 @@ function Quizzes () {
             <li key={quiz._id} style={{ marginBottom: '10px' }}>
               <div>
                 <strong>{quiz.title}</strong> 
-                <p>{quiz.description}</p> 
+                <p className="description">{quiz.description}</p> 
                 <button onClick={() => handleEdit(quiz)}>Edit</button> 
                 <button onClick={() => handleDeleteQuiz(quiz._id)}>Delete</button>
                 <button onClick={() => handleStart(quiz._id)}>Start</button>

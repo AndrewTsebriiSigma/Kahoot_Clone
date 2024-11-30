@@ -14,10 +14,9 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 5000; 
 const SECRET_KEY = "comp229secretkey";
-//const server = http.createServer(app)
 
 app.use(express.json());
-
+app.use(cors());
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST'],

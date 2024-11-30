@@ -40,7 +40,7 @@
   
   .quiz-page strong {
     font-size: 1.2rem;
-    color: #f2f4f7;
+    color: #06000b;
     word-wrap: break-word;
   }
   
@@ -94,5 +94,7 @@
   .quiz-page button:last-of-type:hover {
     background-color: #45a049;
   }
-  
+  .quiz-page .description {
+    color: #06000b;
+  }
   
