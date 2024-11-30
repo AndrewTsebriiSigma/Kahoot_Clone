@@ -3,6 +3,7 @@ const { Server } = require('socket.io');
 const http = require('http')
 const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
+require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app)
@@ -36,7 +37,7 @@ io.on("connection", (socket) => {
     socket.on("send_code", async (code) => {
       console.log(code)
       try {
-        const quiz = await db.collection('quizzes').findOne({quizId: code});
+        const quiz = await quizzesCollection.findOne({quizId: code});
   
         if (quiz && quiz.isValid) {
           socket.emit('checkQuizCode', { isValid: true});
