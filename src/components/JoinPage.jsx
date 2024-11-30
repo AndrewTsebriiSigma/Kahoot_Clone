@@ -32,6 +32,10 @@ function JoinPage() {
         alert("User gives access to camera to scan the QR Code") // open a camera to scan QR Code
     }
 
+    const passRandomQuiz = () => {
+        navigate('/pass-random-quiz');  
+    };
+
     return (
         <>
             <div className="joinField">
@@ -67,7 +71,7 @@ function JoinPage() {
                 </fieldset>
             </div>
 
-            <button>Pass Random Quiz</button>
+            <button onClick={passRandomQuiz}>Pass Random Quiz</button>
         </>
     )
 }
