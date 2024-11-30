@@ -95,35 +95,42 @@ function CreateQuiz() {
       alert('Please fill in all quiz details and add at least one question.');
       return;
     }
-
+  
     try {
-      const quizData = {
-        title,
-        description,
-        questions,
+      const formatted = {
+        quizId: Math.floor(Math.random() * 1000000), 
+        title, 
+        description, 
+        isValid: true,
+        questions: questions.map((question, index) => ({
+          question: question.questionText,
+          options: [question.options.A, question.options.B, question.options.C, question.options.D], 
+          index, 
+        })),
       };
-
-      console.log('Sending quizData:', quizData);
-
+  
+      console.log('Formatted Quiz:', formatted);
+  
       if (quizToEdit) {
         // update existing quiz
-        await axios.put(`http://localhost:5000/api/quizzes/${quizToEdit._id}`, quizData);
+        await axios.put(`http://localhost:5000/api/quizzes/${quizToEdit._id}`, formatted);
         alert('Quiz updated successfully!');
       } else {
         // create a new quiz
-        await axios.post('http://localhost:5000/api/quizzes', quizData);
+        await axios.post('http://localhost:5000/api/quizzes', formatted);
         alert('Quiz created successfully!');
       }
 
       setTitle('');
       setDescription('');
       setQuestions([]);
-      navigate('/quizzes');
+      navigate('/quizzes'); 
     } catch (error) {
-      console.error('Error saving quiz:', error);
+      console.error('Error saving quiz:', error.response?.data || error.message);
       alert('Failed to save quiz.');
     }
   };
+  
 
   return (
     <div>

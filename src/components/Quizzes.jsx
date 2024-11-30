@@ -48,10 +48,6 @@ function Quizzes () {
     navigate('/create-quiz'); 
   };
 
-  const handlePassRandomQuiz =() => {
-    //not done yet
-  }
-
   return (
     <div>
       <h1>Quizzes</h1>
@@ -73,7 +69,6 @@ function Quizzes () {
         </ul>
       )}
       <button onClick={handleAddNewQuiz}>Add New Quiz</button>
-      <button onClick ={handlePassRandomQuiz}> Pass Random Quiz</button> 
     </div>
   );
 };
