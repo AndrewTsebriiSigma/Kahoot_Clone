@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import'./styles/Quizzes.css';
 
 function Quizzes () {
   const navigate = useNavigate();
@@ -49,7 +50,7 @@ function Quizzes () {
   };
 
   return (
-    <div>
+    <div className="quiz-page">
       <h1>Quizzes</h1>
       {quizzes.length === 0 ? (
         <p>No quizzes available. Please add a new quiz.</p>
