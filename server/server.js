@@ -19,7 +19,8 @@ const SECRET_KEY = "comp229secretkey";
 const server = http.createServer(app)
 
 app.use(express.json());
-//app.use(cors( {origin: 'http://localhost:5173' }));
+
+app.use(cors());
 
 // Creating server to check is entered quiz code is valid
 const io = new Server(server, {
@@ -47,14 +48,31 @@ client.connect().then(() => {
 // Registration Route
 app.post("/register", async (req, res) => {
   const { username, email, password, role } = req.body;
-  // Check for existing user
-  if (users.some(user => user.email === email || user.username === username)) {
-    return res.status(400).json("Email or Username is already taken.");
+  if (!username || !email || !password || !role) {
+    return res.status(400).json({ message: "All fields are required." });
   }
-  // Save new user with hashed password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await usersCollection.insertOne({ username, email, password: hashedPassword, role });
-  res.status(201).json("User registered successfully");
+  const existingUser = await usersCollection.findOne({
+    $or: [{ email }, { username }],
+  });
+
+  if (existingUser) {
+    return res.status(400).json({
+      message: "Email or Username is already taken.",
+    });
+  }
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await usersCollection.insertOne({ username, email, password: hashedPassword, role });
+    res.status(201).json({
+      message: "User registered successfully",
+      user: { username, email, role }, // Optionally include user info
+    });
+  } catch (error) {
+    console.error("Error registering user:", error);
+    res.status(500).json({
+      message: "An error occurred during registration. Please try again later.",
+    });
+  }
 });
 
 //Checking if the quizz code is valid
@@ -81,6 +99,9 @@ app.post("/login", async (req, res) => {
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(400).json("Invalid credentials");
   }
+  if (user.role !== role) {
+    return res.status(400).json({ message: "Role mismatch. Please select the correct role." });
+  } 
   // Generate and return a JWT token
   const token = jwt.sign(
     { username: user.username, email: user.email, role: user.role },

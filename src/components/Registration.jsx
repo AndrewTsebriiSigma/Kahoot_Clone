@@ -1,47 +1,54 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const Register = () => {
+const Registration = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!role) {
-      alert("Please select a role (Teacher or Student).");
+    if (!username || !email || !password || !confirmPassword || !role) {
+      setErrorMessage("Please fill in all fields.");
       return;
     }
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setErrorMessage("Passwords do not match.");
       return;
     }
 
     try {
       const response = await fetch("http://localhost:5000/register", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify({ username, email, password, role }),
       });
 
+      // Check if the response is ok, otherwise throw an error
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || "Registration failed, please try again.");
+      }
+
       const data = await response.json();
 
-      if (response.ok) {
-        alert("Registration successful!");
-        navigate("/login"); 
+      if (data.message) {
+        alert(data.message || "Registration successful!");
       } else {
-        alert(data.message || "Registration failed");
+        throw new Error("An unexpected error occurred during registration.");
       }
-    } catch (error) {
-      console.error("Error during registration:", error);
-      alert("An error occurred. Please try again later.");
     }
+      catch (error) {
+        console.error("Error during registration:", error);
+      }
   };
 
   return (
@@ -112,4 +119,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Registration;
