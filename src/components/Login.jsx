@@ -1,12 +1,14 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import './styles/Login.css'
+import logo from '../assets/logo.jpg'
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
 
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -47,7 +49,9 @@ const Login = () => {
     setRole(selectedRole);
   };
 
-  return (
+  return (<div className="login-page">
+    <div className="image"><img src={logo} alt="" /></div>
+
     <div className="container">
       <h2>Hello! Sign in to your account</h2>
       <form onSubmit={handleSubmit}>
@@ -74,7 +78,7 @@ const Login = () => {
               name="role"
               value="teacher"
               checked={role === "teacher"}
-              onChange={handleRoleChange} 
+              onChange={handleRoleChange}
             />{" "}
             Teacher
           </label>
@@ -98,6 +102,7 @@ const Login = () => {
           Create
         </a>
       </h3>
+    </div>
     </div>
   );
 };

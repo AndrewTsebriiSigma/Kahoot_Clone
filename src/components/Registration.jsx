@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import './styles/Login.css'
+import logo from'../assets/logo.jpg'
 
 const Registration = () => {
   const [username, setUsername] = useState("");
@@ -52,6 +54,8 @@ const Registration = () => {
   };
 
   return (
+    <div className="login-page">
+      <div className="image"><img src={logo} alt="" /></div>
     <div className="container">
       <h2>Create an account</h2>
       <form onSubmit={handleSubmit}>
@@ -115,6 +119,7 @@ const Registration = () => {
       <h3>
         Already have an account? <a onClick={() => navigate("/login")}>Login</a>
       </h3>
+    </div>
     </div>
   );
 };
