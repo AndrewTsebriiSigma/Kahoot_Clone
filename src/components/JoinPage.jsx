@@ -2,6 +2,7 @@ import { useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
 
+let socket;
 function JoinPage() {
     const [code, setCode] = useState('');
     const [nickname, setNickname] = useState('');
@@ -16,8 +17,8 @@ function JoinPage() {
     }
 
     const joinQuiz = () => {
-        const socket = io("http://localhost:5000");
-        socket.emit("send_code", code);
+        socket = io.connect("http://localhost:3001");
+        socket.emit("send_code", {message: code});
 
         socket.on('checkQuizCode', (response) => {
             if (response.isValid) {

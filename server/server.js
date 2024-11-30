@@ -16,7 +16,7 @@ const path = require("path");
 const app = express();
 const port = process.env.PORT || 5000; 
 const SECRET_KEY = "comp229secretkey";
-const server = http.createServer(app)
+//const server = http.createServer(app)
 
 app.use(express.json());
 
@@ -27,12 +27,7 @@ app.use(cors({
 }));
 
 // Creating server to check is entered quiz code is valid
-const io = new Server(server, {
-  cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
-  }
-})
+//const io = socketIo(server)
 
 const mongoUri = process.env.MONGO_URI; 
 const secret_key = process.env.JWT_SECRET;
@@ -81,28 +76,28 @@ app.post("/register", async (req, res) => {
 });
 
 //Checking if the quizz code is valid
-io.on("connection", (socket) => {
-  console.log(`User is connected: ${socket.id}`);
+// io.on("connection", (socket) => {
+//   console.log(`User is connected: ${socket.id}`);
 
-  socket.on("send_code", async (code) => {
-    try {
-      const quiz = await db.collection('quizzes').findOne({quizId: code});
+//   socket.on("send_code", async (code) => {
+    // try {
+    //   const quiz = await db.collection('quizzes').findOne({quizId: code});
 
-      if (quiz && quiz.isValid) {
-        socket.emit('checkQuizCode', { isValid: true});
-      } else {
-        socket.emit('checkQuizCode', {isValid: false});
-      }
-    } catch (err) {
-      console.log(err)
-      socket.emit('checkQuizCode', {isValid: false});
-    }
-  })
+    //   if (quiz && quiz.isValid) {
+    //     socket.emit('checkQuizCode', { isValid: true});
+    //   } else {
+    //     socket.emit('checkQuizCode', {isValid: false});
+    //   }
+    // } catch (err) {
+    //   console.log(err)
+    //   socket.emit('checkQuizCode', {isValid: false});
+    // }
+  // })
 
-  socket.on('disconnect', () => {
-    console.log('Client disconnected');
-  })
-})
+//   socket.on('disconnect', () => {
+//     console.log('Client disconnected');
+//   })
+// })
 
 // Login Route
 app.post("/login", async (req, res) => {

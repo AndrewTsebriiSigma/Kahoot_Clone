@@ -5,7 +5,7 @@ import Registration from './components/Registration.jsx'
 import Quizzes from './components/Quizzes.jsx'
 import CreateQuiz from './components/CreateQuiz.jsx'
 import JoinPage from './components/JoinPage.jsx'
-import Lobby from './components/Lobby.jsx'
+// import Lobby from './components/Lobby.jsx'
 
 function App () {
   return (
