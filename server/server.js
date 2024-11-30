@@ -20,14 +20,19 @@ const server = http.createServer(app)
 
 app.use(express.json());
 
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST'],
+  credentials: true,
+}));
 
 // Creating server to check is entered quiz code is valid
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:5173'
+    origin: '*',
+    methods: ['GET', 'POST']
   }
-});
+})
 
 const mongoUri = process.env.MONGO_URI; 
 const secret_key = process.env.JWT_SECRET;
@@ -79,16 +84,23 @@ app.post("/register", async (req, res) => {
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
 
-  socket.on("send_code", (code) => {
-    for (let i = 1; i < quizzesCollection.length; i++) {
-      if (quizzesCollection[i]['Code'] === code) {
-        // useNavigate hook to Lobby.jsx
-        console.log(`${socket.id} was successfully connected to the quiz`);
+  socket.on("send_code", async (code) => {
+    try {
+      const quiz = await db.collection('quizzes').findOne({quizId: code});
+
+      if (quiz && quiz.isValid) {
+        socket.emit('checkQuizCode', { isValid: true});
       } else {
-        console.log('Failed to access');
-        // Stay in Login.jsx component
+        socket.emit('checkQuizCode', {isValid: false});
       }
+    } catch (err) {
+      console.log(err)
+      socket.emit('checkQuizCode', {isValid: false});
     }
+  })
+
+  socket.on('disconnect', () => {
+    console.log('Client disconnected');
   })
 })
 
