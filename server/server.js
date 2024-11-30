@@ -34,33 +34,12 @@ client.connect().then(() => {
   usersCollection = db.collection("users");
 });
 
-// Registration Route
-app.post("/register", async (req, res) => {
-  const { username, email, password, role } = req.body;
-  // Check for existing user
-  if (users.some(user => user.email === email || user.username === username)) {
-    return res.status(400).json("Email or Username is already taken.");
-  }
-  // Save new user with hashed password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  await usersCollection.insertOne({ username, email, password: hashedPassword, role });
-  res.status(201).json("User registered successfully");
-});
-
-// Login Route
-app.post("/login", async (req, res) => {
-  const { email, password, role } = req.body;
-  const user = await usersCollection.findOne({ email });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(400).json("Invalid credentials");
-  }
-  // Generate and return a JWT token
-  const token = jwt.sign(
-    { username: user.username, email: user.email, role: user.role },
-    secret_key,
-    { expiresIn: "1h" }
-  );
-  res.json({ token });
+//User Scheema
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  role: { type: String, required: true },
 });
 
 // add a new quiz
@@ -125,38 +104,71 @@ app.put('/api/quizzes/:id', async (req, res) => {
   }
 });
 
-// Registration Route
+//Register Route
 app.post("/register", async (req, res) => {
   const { username, email, password, role } = req.body;
 
-  // Check for existing user
-  if (users.some(user => user.email === email || user.username === username)) {
-    return res.status(400).json("Email or Username is already taken.");
-  }
+  try {
+    // Check if email or username already exists
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json("Email or Username is already taken.");
+    }
 
-  // Save new user with hashed password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  users.push({ username, email, password: hashedPassword, role });
-  res.status(201).json("User registered successfully");
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Save user to the database
+    const newUser = new User({ username, email, password: hashedPassword, role });
+    await newUser.save();
+
+    res.status(201).json("User registered successfully");
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Internal server error");
+  }
 });
 
 // Login Route
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
-  const user = users.find((u) => u.email === email && u.role === role);
 
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(400).json("Invalid credentials");
+  try {
+    // Find user by email
+    const user = await User.findOne({ email, role });
+    if (!user) {
+      return res.status(400).json("Invalid credentials or role mismatch");
+    }
+
+    // Compare passwords
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (!isPasswordValid) {
+      return res.status(400).json("Invalid credentials");
+    }
+
+    // Generate a JWT token
+    const token = jwt.sign(
+      { username: user.username, email: user.email, role: user.role },
+      SECRET_KEY,
+      { expiresIn: "1h" }
+    );
+
+    res.json({ token });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json("Internal server error");
   }
-
-  // Generate and return a JWT token
-  const token = jwt.sign(
-    { username: user.username, email: user.email, role: user.role },
-    SECRET_KEY,
-    { expiresIn: "1h" }
-  );
-  res.json({ token });
 });
+
+const mongoose = require("mongoose");
+
+mongoose.connect("mongodb://localhost:27017/userDB", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log("Connected to MongoDB"))
+  .catch(err => console.error("Could not connect to MongoDB", err));
+
+
 
 // Start the server 
 app.listen(port, () => {
