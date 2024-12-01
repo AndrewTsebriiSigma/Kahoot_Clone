@@ -9,6 +9,7 @@ function JoinPage() {
     const [quizzes, setQuizzes] = useState(0);
     const [error, setError] = useState('');
     const navigate = useNavigate()
+    const socketUrl = import.meta.env.VITE_BE_SOCKET;
     
     // Add Quiz to Quizzes field + transfer user data to another component
     const handleSubmit = async (e) => {
@@ -17,7 +18,7 @@ function JoinPage() {
     }
 
     const joinQuiz = () => {
-        socket = io.connect("http://localhost:3001");
+        socket = io.connect(socketUrl);
         socket.emit("send_code",  Number(code));
 
         socket.on('checkQuizCode', (response) => {
