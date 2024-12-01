@@ -7,6 +7,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const apiUrl = import.meta.env.VITE_BE_URL;
 
   const navigate = useNavigate();
 
@@ -19,7 +20,7 @@ const Login = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/login", {
+      const response = await fetch(`${apiUrl}/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password, role }),

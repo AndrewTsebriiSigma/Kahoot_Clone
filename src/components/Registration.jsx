@@ -9,6 +9,7 @@ const Registration = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [role, setRole] = useState("");
+  const apiUrl = import.meta.env.VITE_BE_URL;
 
   const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ const Registration = () => {
     }
 
     try {
-      const response = await fetch("http://localhost:5000/register", {
+      const response = await fetch(`${apiUrl}/register`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

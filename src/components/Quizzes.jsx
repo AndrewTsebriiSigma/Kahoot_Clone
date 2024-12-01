@@ -6,12 +6,13 @@ import'./styles/Quizzes.css';
 function Quizzes () {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
+  const apiUrl = import.meta.env.VITE_BE_URL;
 
   //fetch quizzes from the database
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/quizzes');
+        const response = await axios.get(`${apiUrl}/api/quizzes`);
         if (Array.isArray(response.data)) {
           setQuizzes(response.data); 
         } else {
@@ -32,7 +33,7 @@ function Quizzes () {
   // delete quiz from the database
   const handleDeleteQuiz = async (quizId) => {
     try {
-      await axios.delete(`http://localhost:5000/api/quizzes/${quizId}`);
+      await axios.delete(`${apiUrl}/api/quizzes/${quizId}`);
       alert('Quiz deleted successfully!');
       setQuizzes(quizzes.filter((quiz) => quiz._id !== quizId));
     } catch (error) {

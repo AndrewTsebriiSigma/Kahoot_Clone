@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 function CreateQuiz() {
+  const apiUrl = import.meta.env.VITE_BE_URL;
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -113,11 +114,11 @@ function CreateQuiz() {
   
       if (quizToEdit) {
         // update existing quiz
-        await axios.put(`http://localhost:5000/api/quizzes/${quizToEdit._id}`, formatted);
+        await axios.put(`${apiUrl}/api/quizzes/${quizToEdit._id}`, formatted);
         alert('Quiz updated successfully!');
       } else {
         // create a new quiz
-        await axios.post('http://localhost:5000/api/quizzes', formatted);
+        await axios.post(`${apiUrl}/api/quizzes`, formatted);
         alert('Quiz created successfully!');
       }
 
