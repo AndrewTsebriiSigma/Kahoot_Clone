@@ -7,7 +7,7 @@ function CreateQuiz() {
   const navigate = useNavigate();
 
   // if editing, get the quiz data
-  const quizToEdit = location.state?.quiz;
+  const quizToEdit = location.state?.quiz ;
 
   const [title, setTitle] = useState(quizToEdit ? quizToEdit.title : '');
   const [description, setDescription] = useState(quizToEdit ? quizToEdit.description : '');

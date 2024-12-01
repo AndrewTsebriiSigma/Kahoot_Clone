@@ -38,7 +38,6 @@ io.on("connection", (socket) => {
       console.log("Received quiz code:", code);
       try {
         const quiz = await quizzesCollection.findOne( {quizId: Number(code)} );
-        console.log("Quiz found:", quiz);  // Log the quiz object
     
         if (quiz && quiz.isValid) {
           socket.emit('checkQuizCode', { isValid: true });

@@ -44,6 +44,7 @@ const Registration = () => {
 
       if (data.message) {
         alert(data.message || "Registration successful!");
+        navigate("/login");
       } else {
         throw new Error("An unexpected error occurred during registration.");
       }
