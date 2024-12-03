@@ -17,7 +17,7 @@ function Lobby() {
 
     useEffect(() => {
         // server recives that a lobby for a quiz is created 
-        socket.emit('create-quiz-lobby', Number(code));
+        socket.emit('create-quiz-lobby', Number(quizCode));
 
         // listen for new players joining
         socket.on('player-joined', (data) => {
@@ -33,7 +33,7 @@ function Lobby() {
 
     // start the quiz
     const handleStartQuiz = () => {
-        socket.emit('start-quiz', Number(code));
+        socket.emit('start-quiz', Number(quizCode));
         navigate(`/quiz/${quizCode}`);
     };
 
