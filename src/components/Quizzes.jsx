@@ -43,9 +43,6 @@ function Quizzes () {
   };  
 
 
-  const handleStart = (quizId) => {
-    navigate(`/lobby/${quizId}`);
-
   const handleStart = () => {
     // not done yet
 
