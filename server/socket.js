@@ -35,7 +35,6 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
-const lobbies = {} // store players in the lobbies
 
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
@@ -43,8 +42,8 @@ io.on("connection", (socket) => {
   //quiz lobby creation by the teacher 
   socket.on('create-quiz-lobby', async ({ code }) => {
     console.log(`Quiz lobby created: ${code}`);
-    lobbies[code] = []; //starts lobby
-    socket.join(code); //teacher goes to the room
+    lobbies[quizCode] = []; //starts lobby
+    socket.join(quizCode); //teacher goes to the room
 });
 
   //player joining the lobby
@@ -57,7 +56,7 @@ io.on("connection", (socket) => {
       socket.join(code); // join the room for real-time updates
       // notify the teacher and other connected players in the lobby
       io.to(code).emit('player-joined', playerData);
-
+      
     } else {
       // quiz lobby does not exist 
       socket.emit('error', { message: 'Quiz lobby does not exist.' });
