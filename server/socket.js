@@ -35,10 +35,43 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
   },
 });
+const lobbies = {} // store players in the lobbies
 
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
 
+  //quiz lobby creation by the teacher 
+  socket.on('create-quiz-lobby', async ({ code }) => {
+    console.log(`Quiz lobby created: ${code}`);
+    lobbies[quizCode] = []; //starts lobby
+    socket.join(quizCode); //teacher goes to the room
+});
+
+  //player joining the lobby
+  socket.on('join-quiz-lobby', ({ code, nickname }) => {
+    console.log(`Player joined quiz ${code}: ${nickname}`);
+    const playerData = { id: socket.id, nickname };
+
+    if (lobbies[code]) {
+      lobbies[code].push(playerData); // add player to the lobby
+      socket.join(code); // join the room for real-time updates
+      // notify the teacher and other connected players in the lobby
+      io.to(code).emit('player-joined', playerData);
+      
+    } else {
+      // quiz lobby does not exist 
+      socket.emit('error', { message: 'Quiz lobby does not exist.' });
+    }
+  });
+
+  //start quiz
+  socket.on('start-quiz', ({ code }) => {
+    console.log(`Quiz started for code: ${code}`);
+    // notify all paticipants in the quiz room
+    io.to(code).emit('quiz-started', { message: 'The quiz has started!' });
+  });
+
+  //send student to the lobby
   socket.on("send_code", async (code) => {
     console.log("Received quiz code:", code);
     try {

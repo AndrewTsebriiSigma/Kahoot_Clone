@@ -10,6 +10,7 @@ import PassRandomQuizDasboard from './components/PassRandomQuizDashboard.jsx';
 import PassRandomQuizSetup from './components/PassRandomQuizSetup.jsx';
 import PassRandomQuiz from './components/PassRandomQuiz.jsx';
 import PassRandomQuizResults from './components/PassRandomQuizResults.jsx';
+import TeacherLobby from './components/TeacherLobby.jsx';
 
 function App () {
   return (
@@ -28,7 +29,6 @@ function App () {
           <Route path="/random-quiz" element={<PassRandomQuiz />} />
           <Route path="/random-results" element={<PassRandomQuizResults />} />
           <Route path="/create-quiz" element={<CreateQuiz />}/>
-
         </Routes>
       </div>
     </Router>

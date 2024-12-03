@@ -1,30 +1,23 @@
-
-.quiz-page {
+/* Styling for the main container */
+div {
     font-family: Arial, sans-serif;
     margin: 20px;
-    padding: 50px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #6a11cb, #2575fc);
   }
- 
-  .quiz-page h1 {
+  
+  /* Heading style */
+  h1 {
     font-size: 2rem;
     color: #333;
     margin-bottom: 20px;
   }
-
-  .quiz-page ul {
+  
+  /* Style for the quiz list */
+  ul {
     list-style-type: none;
     padding: 0;
-    width: 100%;
-    max-width: 900px; 
-    margin: 0 auto;
   }
   
-  .quiz-page li {
+  li {
     background-color: #f4f4f4;
     padding: 15px;
     border-radius: 8px;
@@ -33,25 +26,23 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
-    width: 100%;
-    max-width: 800px; 
-    margin: 10px auto; 
   }
   
-  .quiz-page strong {
+  /* Styling for the quiz title */
+  strong {
     font-size: 1.2rem;
-    color: #06000b;
-    word-wrap: break-word;
+    color: #0056b3;
   }
   
-  .quiz-page p {
+  /* Styling for the quiz description */
+  p {
     font-size: 1rem;
-    color: #fcf8f8;
+    color: #555;
     margin: 10px 0;
-    word-wrap: break-word;
   }
   
-  .quiz-page button {
+  /* Button group styling */
+  button {
     padding: 8px 15px;
     margin: 5px;
     border: none;
@@ -60,30 +51,33 @@
     transition: background-color 0.3s ease;
   }
   
-  .quiz-page button:hover {
+  /* Individual button styles */
+  button:hover {
     opacity: 0.8;
   }
   
-  .quiz-page button:focus {
+  button:focus {
     outline: none;
   }
   
-  .quiz-page button:nth-of-type(1) {
-    background-color: #4CAF50;
+  /* Specific button color styling */
+  button:nth-of-type(1) {
+    background-color: #4CAF50; /* Green for Edit */
     color: white;
   }
   
-  .quiz-page button:nth-of-type(2) {
-    background-color: #f44336; 
+  button:nth-of-type(2) {
+    background-color: #f44336; /* Red for Delete */
     color: white;
   }
   
-  .quiz-page button:nth-of-type(3) {
-    background-color: #008CBA; 
+  button:nth-of-type(3) {
+    background-color: #008CBA; /* Blue for Start */
     color: white;
   }
   
-  .quiz-page button:last-of-type {
+  /* Add New Quiz button styling */
+  button:last-of-type {
     background-color: #4CAF50;
     color: white;
     font-size: 1.1rem;
@@ -91,10 +85,13 @@
     padding: 10px 20px;
   }
   
-  .quiz-page button:last-of-type:hover {
+  button:last-of-type:hover {
     background-color: #45a049;
   }
-  .quiz-page .description {
-    color: #06000b;
+  
+  /* No quizzes available message */
+  p {
+    font-size: 1.1rem;
+    color: #d9534f;
   }
   

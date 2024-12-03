@@ -43,7 +43,7 @@ function Quizzes () {
   };  
 
   const handleStart = () => {
-    // not done yet
+    navigate('/lobby/:code');
   };
 
   const handleAddNewQuiz = () => {
