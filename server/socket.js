@@ -43,8 +43,8 @@ io.on("connection", (socket) => {
   //quiz lobby creation by the teacher 
   socket.on('create-quiz-lobby', async ({ code }) => {
     console.log(`Quiz lobby created: ${code}`);
-    lobbies[quizCode] = []; //starts lobby
-    socket.join(quizCode); //teacher goes to the room
+    lobbies[code] = []; //starts lobby
+    socket.join(code); //teacher goes to the room
 });
 
   //player joining the lobby
@@ -57,7 +57,7 @@ io.on("connection", (socket) => {
       socket.join(code); // join the room for real-time updates
       // notify the teacher and other connected players in the lobby
       io.to(code).emit('player-joined', playerData);
-      
+
     } else {
       // quiz lobby does not exist 
       socket.emit('error', { message: 'Quiz lobby does not exist.' });
@@ -90,6 +90,16 @@ io.on("connection", (socket) => {
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
+
+    //remove players from lobby
+    for (const [code, players] of Object.entries(lobbies)) {
+      const index = players.findIndex((player) => player.id === socket.id);
+      if (index !== -1) {
+          players.splice(index, 1); // remove player
+          io.to(code).emit('player-left', { id: socket.id }); 
+          break;
+      }
+  }
   });
 });
 
