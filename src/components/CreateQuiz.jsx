@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
+import "./styles/CreateQuiz.css"
+import logo from "../assets/logo.jpg"
 
 function CreateQuiz() {
   const apiUrl = import.meta.env.VITE_BE_URL;
@@ -8,7 +10,7 @@ function CreateQuiz() {
   const navigate = useNavigate();
 
   // if editing, get the quiz data
-  const quizToEdit = location.state?.quiz ;
+  const quizToEdit = location.state?.quiz;
 
   const [title, setTitle] = useState(quizToEdit ? quizToEdit.title : '');
   const [description, setDescription] = useState(quizToEdit ? quizToEdit.description : '');
@@ -24,7 +26,7 @@ function CreateQuiz() {
     if (quizToEdit) {
       setTitle(quizToEdit.title);
       setDescription(quizToEdit.description);
-      setQuestions(quizToEdit.questions || []);  
+      setQuestions(quizToEdit.questions || []);
     }
   }, [quizToEdit]);
 
@@ -96,22 +98,22 @@ function CreateQuiz() {
       alert('Please fill in all quiz details and add at least one question.');
       return;
     }
-  
+
     try {
       const formatted = {
-        quizId: Math.floor(Math.random() * 1000000), 
-        title, 
-        description, 
+        quizId: Math.floor(Math.random() * 1000000),
+        title,
+        description,
         isValid: true,
         questions: questions.map((question, index) => ({
           question: question.questionText,
-          options: [question.options.A, question.options.B, question.options.C, question.options.D], 
-          index, 
+          options: [question.options.A, question.options.B, question.options.C, question.options.D],
+          index,
         })),
       };
-  
+
       console.log('Formatted Quiz:', formatted);
-  
+
       if (quizToEdit) {
         // update existing quiz
         await axios.put(`${apiUrl}/api/quizzes/${quizToEdit._id}`, formatted);
@@ -125,109 +127,126 @@ function CreateQuiz() {
       setTitle('');
       setDescription('');
       setQuestions([]);
-      navigate('/quizzes'); 
+      navigate('/quizzes');
     } catch (error) {
       console.error('Error saving quiz:', error.response?.data || error.message);
       alert('Failed to save quiz.');
     }
   };
-  
+
 
   return (
-    <div>
-      <h2>{quizToEdit ? 'Edit Quiz' : 'Create Quiz'}</h2>
-      <div>
-        <label>
-          Quiz Title:
-          <input type="text" value={title} onChange={handleTitleChange} />
-        </label>
-      </div>
-      <div>
-        <label>
-          Description:
-          <textarea value={description} onChange={handleDescriptionChange} />
-        </label>
+    <div className='main'>
+      <div className="header">
+        <div className="image"><img src={logo} alt="" /></div>
+        <h2>{quizToEdit ? 'Edit Quiz' : 'Create Quiz'}</h2>
+
+        <div className='info'>
+          <div >
+            <label>
+              Quiz Title:</label>
+            <input type="text" value={title} onChange={handleTitleChange} />
+
+          </div>
+          <div>
+            <label>
+              Description:</label>
+            <textarea value={description} onChange={handleDescriptionChange} />
+
+          </div>
+        </div>
       </div>
 
       <h3>{isEditing ? 'Edit Question' : 'Add Question'}</h3>
-      <div>
-        <label>Question:
-          <input
-            type="text"
-            value={questionText}
-            onChange={handleQuestionChange}
-          />
-        </label>
-      </div>
-      <div>
-        <label>Option A:
-          <input
-            type="text"
-            value={options.A}
-            onChange={(e) => handleOptionChange('A', e.target.value)}
-          />
-        </label>
-        <label>Option B:
-          <input
-            type="text"
-            value={options.B}
-            onChange={(e) => handleOptionChange('B', e.target.value)}
-          />
-        </label>
-        <label>Option C:
-          <input
-            type="text"
-            value={options.C}
-            onChange={(e) => handleOptionChange('C', e.target.value)}
-          />
-        </label>
-        <label>Option D:
-          <input
-            type="text"
-            value={options.D}
-            onChange={(e) => handleOptionChange('D', e.target.value)}
-          />
-        </label>
-      </div>
-      <div>
-        <label>Correct Answer:
-          <select value={correctAnswer} onChange={handleCorrectAnswerChange}>
-            <option value="">Select correct answer</option>
-            <option value="A">A</option>
-            <option value="B">B</option>
-            <option value="C">C</option>
-            <option value="D">D</option>
-          </select>
-        </label>
-      </div>
-      <button onClick={handleSaveQuestion}>
-        {isEditing ? 'Update Question' : 'Save Question'}
-      </button>
+      <div className="bigDiv">
+        <div className="make-question">
+          <div className='question'>
 
-      <h3>Questions</h3>
-      {questions.length === 0 ? (
-        <p>No questions added yet.</p>
-      ) : (
-        <ul>
-          {questions.map((question, index) => (
-            <li key={index}>
-              <div>
-                <strong>{question.questionText}</strong>
-                <ul>
-                  <li>A: {question.options.A}</li>
-                  <li>B: {question.options.B}</li>
-                  <li>C: {question.options.C}</li>
-                  <li>D: {question.options.D}</li>
-                </ul>
-                <p>Correct Answer: {question.correctAnswer}</p>
-                <button onClick={() => handleEditQuestion(index)}>Edit</button>
-                <button onClick={() => handleDeleteQuestion(index)}>Delete</button>
-              </div>
-            </li>
-          ))}
-        </ul>
-      )}
-      <button onClick={handleSaveQuiz}>{quizToEdit ? 'Save Changes' : 'Create Quiz'}</button>
+            <input style={{ width: 600 }}
+              type="text"
+              value={questionText}
+              onChange={handleQuestionChange}
+              placeholder='Start typing your question'
+            />
+
+          </div>
+          <div className='options'>
+
+            <input
+              placeholder='Enter option A'
+              type="text"
+              value={options.A}
+              onChange={(e) => handleOptionChange('A', e.target.value)}
+            />
+
+
+            <input
+              placeholder='Enter option B'
+              type="text"
+              value={options.B}
+              onChange={(e) => handleOptionChange('B', e.target.value)}
+            />
+
+
+            <input
+              placeholder='Enter option C'
+              type="text"
+              value={options.C}
+              onChange={(e) => handleOptionChange('C', e.target.value)}
+            />
+
+            <input
+              placeholder='Enter option D'
+              type="text"
+              value={options.D}
+              onChange={(e) => handleOptionChange('D', e.target.value)}
+            />
+
+          </div>
+          <div style={{ color: "white", padding: '5px', background: 'black', opacity: '0.7', borderRadius: '5px' }}>
+            <label>Correct Answer:
+              <select value={correctAnswer} onChange={handleCorrectAnswerChange}>
+                <option value="">Select correct answer</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </label>
+          </div>
+          <button onClick={handleSaveQuestion}>
+            {isEditing ? 'Update Question' : 'Save Question'}
+          </button>
+        </div>
+        <div className="questions">
+          <h3>Questions</h3>
+          {questions.length === 0 ? (
+            <p>No questions added yet.</p>
+          ) : (
+            <ul>
+              {questions.map((question, index) => (
+                <li key={index}>
+                  <div className='saved-question'>
+                    <strong>{question.questionText}</strong>
+                    <ul>
+                      <li>A: {question.options.A}</li>
+                      <li>B: {question.options.B}</li>
+                      <li>C: {question.options.C}</li>
+                      <li>D: {question.options.D}</li>
+                    </ul>
+                    <p>Correct Answer: {question.correctAnswer}</p>
+                    <div className="save-edit">
+                      <button onClick={() => handleEditQuestion(index)}>Edit</button>
+                      <button className='delete' onClick={() => handleDeleteQuestion(index)}>Delete</button>
+                    </div>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+      <button className='create-quiz-button' onClick={handleSaveQuiz}>{quizToEdit ? 'Save Changes' : 'Create Quiz'}</button>
     </div>
   );
 };

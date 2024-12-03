@@ -1,0 +1,16 @@
+.setup-container{
+    min-width: 25vw;
+    font-size: 1.5rem;
+    font-weight: bold;
+    display: flex;
+    gap: 10px;
+
+}
+
+.setup-container button{
+    width: fit-content;
+}
+
+.setup-container input{
+    font-size: 1.5rem;
+}
