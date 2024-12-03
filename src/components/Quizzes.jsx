@@ -42,8 +42,8 @@ function Quizzes () {
     }
   };  
 
-  const handleStart = () => {
-    navigate('/lobby/:code');
+  const handleStart = (quizId) => {
+    navigate(`/lobby/${quizId}`);
   };
 
   const handleAddNewQuiz = () => {
