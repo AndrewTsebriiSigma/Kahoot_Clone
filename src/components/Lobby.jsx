@@ -44,7 +44,10 @@ function Lobby() {
         // Fetch user role (teacher or student)
         const fetchRole = async () => {
             try {
-                const response = await fetch(`${apiUrl}/api/users`);  
+                const response = await fetch(`${apiUrl}/api/users`, {
+                    method: 'POST',
+                    body: JSON.stringify({ role })
+                });  
                 const data = await response.json();
         
                 if (response.ok) {  

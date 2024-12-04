@@ -134,7 +134,8 @@ app.delete('/api/quizzes/:id', async (req, res) => {
 
 // Get user role
 app.get('/api/users', async (req, res) => {
-  const user = await usersCollection.findOne({});
+  const {role} = req.body;
+  const user = await usersCollection.findOne({ role });
   try {
     if (user) {
       res.json({role: user.role}) 
