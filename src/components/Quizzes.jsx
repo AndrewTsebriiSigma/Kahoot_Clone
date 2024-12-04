@@ -76,5 +76,4 @@ function Quizzes () {
     </div>
   );
 };
-}
 export default Quizzes
