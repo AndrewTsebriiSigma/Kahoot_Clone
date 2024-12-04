@@ -1,20 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import  './styles/RandomSetup.css'
-import logo from '../assets/logo.jpg'
+import "./styles/PassRandomQuiz.css";
 
 const PassRandomQuizSetup = () => {
     const [numQuestions, setNumQuestions] = useState(10);
     const navigate = useNavigate();
   
     const startQuiz = () => {
-      navigate('/random-quiz', { state: { numQuestions } });
+      navigate('/quiz', { state: { numQuestions } });
     };
   
     return (
-      <div className="random-dashboard">
-        <div className="image"> <img src={logo} alt="" /></div>
-      <div className="setup-container container">
+      <div className="random-dashboard"> {/* Added the random-dashboard class here */}
         <h2>Quiz Setup</h2>
         <label>
           <p>Number of Questions:</p>
@@ -26,7 +23,6 @@ const PassRandomQuizSetup = () => {
           />
         </label>
         <button onClick={startQuiz}>Start Quiz</button>
-      </div>
       </div>
     );
 };

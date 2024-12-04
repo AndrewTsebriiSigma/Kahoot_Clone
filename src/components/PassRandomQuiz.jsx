@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { fetchTriviaQuestions } from '../api/triviaAPI';
+import "./styles/PassRandomQuiz.css";
 
 const PassRandomQuiz = () => {
   const location = useLocation();
@@ -30,7 +31,7 @@ const PassRandomQuiz = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      navigate('/random-results', { state: { score, total: questions.length } });
+      navigate('/results', { state: { score, total: questions.length } });
     }
   };
 

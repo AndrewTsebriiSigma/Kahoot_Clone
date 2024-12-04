@@ -1,5 +1,7 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import "./styles/PassRandomQuiz.css";
+
 
 const PassRandomQuizResults = () => {
     const location = useLocation();
@@ -10,7 +12,7 @@ const PassRandomQuizResults = () => {
       <div className="container">
         <h2>Quiz Results</h2>
         <p>Your Score: {score}/{total}</p>
-        <button onClick={() => navigate('/pass-random-quiz')}>Back to Pass Random Quiz</button>
+        <button onClick={() => navigate('/')}>Back to Pass Random Quiz</button>
       </div>
     );
 };
