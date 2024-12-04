@@ -28,7 +28,6 @@ function App () {
           <Route path="/random-quiz" element={<PassRandomQuiz />} />
           <Route path="/random-results" element={<PassRandomQuizResults />} />
           <Route path="/create-quiz" element={<CreateQuiz />}/>
-
         </Routes>
       </div>
     </Router>
