@@ -1,6 +1,8 @@
 import { useState, useEffect} from 'react'
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
+import "./styles/CreateQuiz.css"
+import './styles/JoinPage.css'
 
 let socket;
 function JoinPage() {
@@ -37,23 +39,27 @@ function JoinPage() {
         navigate('/pass-random-quiz');  
     };
 
+    const displayPassedQuizzes = () => {
+        // if quiz starts, automatically display it in passedQuizzes fieldset
+    }
+
     return (
         <>
             <div className="joinField">
-                <h3>Join Quiz</h3>
                 <form onSubmit={handleSubmit}>
-                    <fieldset>
+                    <fieldset className="quizForm">
+                        <h3>Join Quiz</h3>
                         <label htmlFor="">
-                            Enter CODE
+                            <strong>Enter CODE:</strong>
                             <input type="text" className="code" placeholder="Enter quiz code" 
                             value={code} onChange={(e) => setCode(e.target.value)} required/>
                         </label>
                         <label htmlFor="">
-                            OR
+                            <strong>OR</strong>
                         </label>
                         <button className="openQRCode" onClick={openQRWindow}>Scan QR Code</button>
                         <label htmlFor="">
-                            Nickname
+                            <strong>Nickname:</strong>
                             <input type="text"  placeholder="Enter your nickname" 
                             value={nickname} onChange={(e) =>setNickname(e.target.value)} required />
                         </label>
@@ -64,15 +70,16 @@ function JoinPage() {
             </div>
 
             <div className="resultField">
-                <h3>Quizzes</h3>
                 
-                <fieldset>
+                <fieldset className="passedQuizzes">
+                    <h3>Quizzes</h3>
                     <p>This field should be table of passed quizzes in the future</p>
                     <p>There are no passed quizzes yet!</p>
                 </fieldset>
             </div>
-
-            <button onClick={passRandomQuiz}>Pass Random Quiz</button>
+            <div className="passQuiz">
+                <button onClick={passRandomQuiz}>Pass Random Quiz</button>
+            </div>
         </>
     )
 }

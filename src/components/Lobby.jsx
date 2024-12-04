@@ -1,7 +1,7 @@
 import { useState, useEffect} from 'react'
 import { useLocation, useNavigate } from "react-router-dom"
 import io from 'socket.io-client'
-import QRCode from 'qrcode.react'
+//import QRCode from 'qrcode.react'
 
 const socket = io.connect(import.meta.env.VITE_BE_SOCKET);
 
@@ -71,7 +71,7 @@ function Lobby() {
                     <h3>{quizCode}</h3>
 
                     <p>Or scan QR code to join:</p>
-                    <QRCode value="https://your-app-url/join?code=${quizCode}" size={200}/>
+                    {/* <QRCode value="https://quiz/join?code=${quizCode}" size={200}/> */}
                 </div>
 
                 <div className="players-list">
