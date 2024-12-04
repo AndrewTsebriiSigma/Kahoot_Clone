@@ -36,18 +36,36 @@ const io = new Server(server, {
   },
 });
 
+let lobbies ={};
+
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
 
   //quiz lobby creation by the teacher 
-  socket.on('create-quiz-lobby', async ({ code }) => {
-    console.log(`Quiz lobby created: ${code}`);
-    lobbies[quizCode] = []; //starts lobby
-    socket.join(quizCode); //teacher goes to the room
-});
+  socket.on('create-quiz-lobby', async (data) => {
+    if (!data || !data.code) {
+      console.error('Invalid data received for create-quiz-lobby:', data);
+      return;
+    }
 
-  //player joining the lobby
+    const { code } = data;
+    console.log(`Quiz lobby created: ${code}`);
+
+    // initialize the lobby if it doesn't exist
+    if (!lobbies[code]) {
+      lobbies[code] = [];
+    }
+
+    socket.join(code); // teacher joins the room
+  });
+
+  // player joins the quiz lobby
   socket.on('join-quiz-lobby', ({ code, nickname }) => {
+    if (!code || !nickname) {
+      console.error('Invalid data received for join-quiz-lobby:', { code, nickname });
+      return;
+    }
+
     console.log(`Player joined quiz ${code}: ${nickname}`);
     const playerData = { id: socket.id, nickname };
 
@@ -56,17 +74,21 @@ io.on("connection", (socket) => {
       socket.join(code); // join the room for real-time updates
       // notify the teacher and other connected players in the lobby
       io.to(code).emit('player-joined', playerData);
-      
     } else {
-      // quiz lobby does not exist 
+      // quiz lobby does not exist
       socket.emit('error', { message: 'Quiz lobby does not exist.' });
     }
   });
 
-  //start quiz
+  // start the quiz
   socket.on('start-quiz', ({ code }) => {
+    if (!code) {
+      console.error('Quiz code missing for start-quiz event');
+      return;
+    }
+
     console.log(`Quiz started for code: ${code}`);
-    // notify all paticipants in the quiz room
+    // notify all users in the quiz room
     io.to(code).emit('quiz-started', { message: 'The quiz has started!' });
   });
 
