@@ -25,7 +25,12 @@ function JoinPage() {
 
         socket.on('checkQuizCode', (response) => {
             if (response.isValid) {
-                navigate(`/lobby/${code}`)
+                navigate("/lobby", {
+                    state: {
+                        message: code,
+                        username: nickname,
+                    },
+                });                
             } else {
                 setError('Invalid quiz code!');
             }
