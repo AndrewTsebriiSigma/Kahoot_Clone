@@ -43,20 +43,20 @@ function Quizzes () {
   };  
 
 
-  const handleStart = (quizCode) => {
-    if (!quizCode) {  
-        console.error("Quiz Code is missing!");
+  const handleStart = (quizId) => {
+    if (!quizId) {
+        console.error("Quiz ID is missing!");
         return;
     }
+
+    // Pass quizId correctly as the state
     navigate('/lobby', {
         state: {
-            quizCode,  
-            role: "teacher",
+            quizCode: quizId,  // Correctly pass quizId as quizCode
+            role: "teacher",    // Assume role as teacher for now
         },
     });
 };
-
-
 
   const handleAddNewQuiz = () => {
     navigate('/create-quiz'); 
@@ -76,7 +76,7 @@ function Quizzes () {
                 <p className="description">{quiz.description}</p> 
                 <button onClick={() => handleEdit(quiz)}>Edit</button> 
                 <button onClick={() => handleDeleteQuiz(quiz._id)}>Delete</button>
-                <button onClick={() => handleStart(quiz.code)}>Start</button>
+                <button onClick={() => handleStart(quiz.quizId)}>Start</button>
               </div>
             </li>
           ))}

@@ -27,7 +27,7 @@ function JoinPage() {
             if (response.isValid) {
                 navigate("/lobby", {
                     state: {
-                        message: code,
+                        quizCode: code,
                         username: nickname,
                         role: "student",
                     },

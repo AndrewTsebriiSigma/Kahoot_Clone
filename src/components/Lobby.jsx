@@ -14,7 +14,7 @@ function Lobby() {
 
     const location = useLocation();
     const navigate = useNavigate();
-    const quizCode = location.state?.message;
+    const quizCode = location.state?.quizCode;
     const userName = location.state?.username;
     const quizTitle = location.state?.quizTitle;
     const quizDescription = location.state?.quizDescription;
