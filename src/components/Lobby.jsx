@@ -4,18 +4,18 @@ import io from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
 
 const socket = io.connect(import.meta.env.VITE_BE_SOCKET);
-const apiUrl = import.meta.env.VITE_BE_URL;
+
 
 function Lobby() {
     const [playerCounter, setPlayerCounter] = useState(0);
     const [buttonAvailable, setButtonAvailable] = useState(false);
     const [players, setPlayers] = useState([]);
-    const [role, setRole] = useState("");
 
     const location = useLocation();
     const navigate = useNavigate();
     const quizCode = location.state?.quizCode;
     const userName = location.state?.username;
+    const userRole = location.state?.role;
     const quizTitle = location.state?.quizTitle;
     const quizDescription = location.state?.quizDescription;
 
@@ -41,7 +41,8 @@ function Lobby() {
             });
         });
 
-        // clean event listeners on component unmount
+
+        //clean event listeners on component unmount
         return () => {
             socket.off("player-joined");
         };
@@ -49,27 +50,8 @@ function Lobby() {
 
 
     useEffect(() => {
-        // Fetch user role (teacher or student)
-        const fetchRole = async () => {
-            try {
-                const response = await fetch(`${apiUrl}/api/users`, {
-                    method: 'GET',
-                    body: JSON.stringify({ role })
-                });  
-                const data = await response.json();
-        
-                if (response.ok) {  
-                    setRole(data.role);  
-                } else {
-                    console.log('Something went wrong...');
-                }
-            } catch (err) {
-                console.log('Error fetching role:', err);  
-            }
-        };        
-        fetchRole();
         // update button availability when role or player count changes
-        if (role === "teacher" && playerCounter > 0) {
+        if (userRole === "teacher" && playerCounter > 0) {
             setButtonAvailable(true);
         } else {
             setButtonAvailable(false);
