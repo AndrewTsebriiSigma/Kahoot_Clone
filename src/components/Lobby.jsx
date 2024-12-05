@@ -41,11 +41,19 @@ function Lobby() {
             });
         });
 
+        // clean event listeners on component unmount
+        return () => {
+            socket.off("player-joined");
+        };
+    }, [quizCode]);
+
+
+    useEffect(() => {
         // Fetch user role (teacher or student)
         const fetchRole = async () => {
             try {
                 const response = await fetch(`${apiUrl}/api/users`, {
-                    method: 'POST',
+                    method: 'GET',
                     body: JSON.stringify({ role })
                 });  
                 const data = await response.json();
@@ -60,15 +68,6 @@ function Lobby() {
             }
         };        
         fetchRole();
-
-        // clean event listeners on component unmount
-        return () => {
-            socket.off("player-joined");
-        };
-    }, [quizCode]);
-
-
-    useEffect(() => {
         // update button availability when role or player count changes
         if (role === "teacher" && playerCounter > 0) {
             setButtonAvailable(true);
