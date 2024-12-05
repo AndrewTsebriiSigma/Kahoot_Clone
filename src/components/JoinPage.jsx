@@ -29,6 +29,7 @@ function JoinPage() {
                     state: {
                         message: code,
                         username: nickname,
+                        role: "student",
                     },
                 });                
             } else {
