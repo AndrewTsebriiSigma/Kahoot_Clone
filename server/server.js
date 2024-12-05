@@ -132,21 +132,6 @@ app.delete('/api/quizzes/:id', async (req, res) => {
   }
 });
 
-// Get user role
-app.get('/api/users', async (req, res) => {
-  const {role} = req.body;
-  const user = await usersCollection.findOne({ role });
-  try {
-    if (user) {
-      res.json({role: user.role}) 
-    } else {
-      res.status(404).json({message: 'Impossible to find the role'})
-    } 
-  } catch (err) {
-      res.json({message: err})
-  }
-})
-
 // update an existing quiz 
 app.put('/api/quizzes/:id', async (req, res) => {
   try {

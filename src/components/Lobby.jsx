@@ -56,7 +56,7 @@ function Lobby() {
         } else {
             setButtonAvailable(false);
         }
-    }, [role, playerCounter]);  
+    }, [userRole, playerCounter]);  
 
     const handleQuiz = () => {
         if (quizCode) {
@@ -87,9 +87,11 @@ function Lobby() {
                 </ul>
             </div>
 
-            <button disabled={!buttonAvailable} onClick={handleQuiz}>
-                Start Quiz
-            </button>
+            {userRole === "teacher" && (
+                <button disabled={!buttonAvailable} onClick={handleQuiz}>
+                    Start Quiz
+                </button>
+            )}
         </div>
     );
 }

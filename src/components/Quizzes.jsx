@@ -49,11 +49,11 @@ function Quizzes () {
         return;
     }
 
-    // Pass quizId correctly as the state
+    // quizId as state
     navigate('/lobby', {
         state: {
-            quizCode: quizId,  // Correctly pass quizId as quizCode
-            role: "teacher",    // Assume role as teacher for now
+            quizCode: quizId,  
+            role: "teacher",    
         },
     });
 };
