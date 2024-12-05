@@ -31,7 +31,7 @@ const PassRandomQuiz = () => {
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     } else {
-      navigate('/results', { state: { score, total: questions.length } });
+      navigate('/random-results', { state: { score, total: questions.length } });
     }
   };
 
