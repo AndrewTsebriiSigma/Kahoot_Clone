@@ -8,7 +8,7 @@ require('dotenv').config();
 const app = express();
 
 app.use(express.json());
-app.use(cors()); 
+app.use(cors());
 
 const mongoUri = process.env.MONGO_URI;
 const client = new MongoClient(mongoUri, {
@@ -21,7 +21,7 @@ let quizzesCollection, usersCollection;
 client.connect()
   .then(() => {
     console.log("Connected to MongoDB");
-    const db = client.db("quizApp"); 
+    const db = client.db("quizApp");
     quizzesCollection = db.collection("quizzes");
     usersCollection = db.collection("users");
   })
@@ -31,12 +31,12 @@ const server = http.createServer(app);
 // Set up Socket.IO
 const io = new Server(server, {
   cors: {
-    origin: '*', 
+    origin: '*',
     methods: ['GET', 'POST'],
   },
 });
 
-let lobbies ={};
+let lobbies = {};
 
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
@@ -49,11 +49,15 @@ io.on("connection", (socket) => {
     }
 
     const { code } = data;
-    console.log(`Quiz lobby created: ${code}`);
+    // console.log(`Quiz lobby created: ${code}`);
 
     // initialize the lobby if it doesn't exist
     if (!lobbies[code]) {
       lobbies[code] = [];
+      console.log(`new lobby created with code ${code}`);
+    }
+    else {
+      console.log(`lobby already exists for code ${code}`);
     }
 
     socket.join(code); // teacher joins the room
@@ -72,8 +76,12 @@ io.on("connection", (socket) => {
     if (lobbies[code]) {
       lobbies[code].push(playerData); // add player to the lobby
       socket.join(code); // join the room for real-time updates
+
+      console.log(`Sockets in room ${code}:`, Array.from(io.sockets.adapter.rooms.get(code) || [])); //harsh log
+
+
       // notify the teacher and other connected players in the lobby
-      io.to(code).emit('player-joined', playerData);
+      io.to(code).emit('player-joined', { playerData, playerCount: lobbies[code].length });   //harsh, emitting num of players as well
     } else {
       // quiz lobby does not exist
       socket.emit('error', { message: 'Quiz lobby does not exist.' });
@@ -116,11 +124,11 @@ io.on("connection", (socket) => {
     for (const [code, players] of Object.entries(lobbies)) {
       const index = players.findIndex((player) => player.id === socket.id);
       if (index !== -1) {
-          players.splice(index, 1); // remove player
-          io.to(code).emit('player-left', { id: socket.id }); 
-          break;
+        players.splice(index, 1); // remove player
+        io.to(code).emit('player-left', { id: socket.id, playerCount: lobbies[code].length });
+        break;
       }
-  }
+    }
   });
 });
 
