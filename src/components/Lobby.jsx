@@ -30,15 +30,14 @@ function Lobby() {
         // Emit event to create quiz lobby
         socket.emit("create-quiz-lobby", { code: Number(quizCode) });
 
-        // Listen for player-joined event
+      
+        //new one
         socket.on("player-joined", (data) => {
-            console.log("Player joined:", data);
+            console.log(`player join received by client socket id: ${socket.id}:`, data);
             setPlayers((prevPlayers) => {
-                return [...prevPlayers, data];
+                return [...prevPlayers, data.playerData.nickname];
             });
-            setPlayerCounter((prevCount) => {
-                return prevCount + 1;
-            });
+            setPlayerCounter(data.playerCount)
         });
 
 
@@ -46,26 +45,52 @@ function Lobby() {
         return () => {
             socket.off("player-joined");
         };
-    }, [quizCode]);
+    }, []); //harsh removed quizCode dependency
 
 
+    //New useEffects for fetching token stored in local storage and then setting the approp role for user
     useEffect(() => {
+        // Fetch user role (teacher or student)
+        const fetchRole = async () => {
+            try {
+                const response = await fetch(`${apiUrl}/api/users`, {
+                    method: 'GET',
+                    body: JSON.stringify({ role })
+                });  
+                const data = await response.json();
+        
+                if (response.ok) {  
+                    setRole(data.role);  
+                } else {
+                    console.log('Something went wrong...');
+                }
+            } catch (err) {
+                console.log('Error fetching role:', err);  
+            }
+        };        
+        fetchRole();
         // update button availability when role or player count changes
-        if (userRole === "teacher" && playerCounter > 0) {
+        if (role === "teacher" && playerCounter > 0) {
             setButtonAvailable(true);
         } else {
             setButtonAvailable(false);
         }
-    }, [userRole, playerCounter]);  
+    }, [role, playerCounter]);  
 
     const handleQuiz = () => {
         if (quizCode) {
             socket.emit("start-quiz", { code: Number(quizCode) });
-            navigate(`/quiz/${quizCode}`); // Navigate to quiz component
+            // navigate(`/quiz/${quizCode}`); // just changed this, now navigation is in useEffect 
         } else {
             console.error("Cannot start quiz. Quiz code is missing.");
         }
     };
+
+
+
+
+
+    //
 
     return (
         <div className="roomID">
