@@ -30,60 +30,102 @@ function Lobby() {
         // Emit event to create quiz lobby
         socket.emit("create-quiz-lobby", { code: Number(quizCode) });
 
-        // Listen for player-joined event
+      
+        //new one
         socket.on("player-joined", (data) => {
-            console.log("Player joined:", data);
+            console.log(`player join received by client socket id: ${socket.id}:`, data);
             setPlayers((prevPlayers) => {
-                return [...prevPlayers, data];
+                return [...prevPlayers, data.playerData.nickname];
             });
-            setPlayerCounter((prevCount) => {
-                return prevCount + 1;
-            });
+            setPlayerCounter(data.playerCount)
         });
 
         // clean event listeners on component unmount
         return () => {
             socket.off("player-joined");
         };
-    }, [quizCode]);
+    }, []); //harsh removed quizCode dependency
 
 
+    //New useEffects for fetching token stored in local storage and then setting the approp role for user
     useEffect(() => {
-        // Fetch user role (teacher or student)
         const fetchRole = async () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.error("No token found. User not authenticated.");
+                return;
+            }
+
             try {
                 const response = await fetch(`${apiUrl}/api/users`, {
                     method: 'GET',
-                    body: JSON.stringify({ role })
-                });  
-                const data = await response.json();
-        
-                if (response.ok) {  
-                    setRole(data.role);  
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setRole(data.role);
                 } else {
-                    console.log('Something went wrong...');
+                    console.error("Failed to fetch role. Please check the backend or token validity.");
                 }
             } catch (err) {
-                console.log('Error fetching role:', err);  
+                console.error("Error fetching role:", err);
             }
-        };        
+        };
+
         fetchRole();
-        // update button availability when role or player count changes
-        if (role === "teacher" && playerCounter > 0) {
-            setButtonAvailable(true);
-        } else {
-            setButtonAvailable(false);
-        }
-    }, [role, playerCounter]);  
+        console.log(role)
+    }, []);
+
+    useEffect(() => {
+        console.log("role", role, "playercount", playerCounter)
+        setButtonAvailable(role === "teacher" && playerCounter > 0);
+    }, [role, playerCounter]);
+
+
+
+    //useEffect that listens quiz-started and does role based navigation
+
+    useEffect(() => {
+        socket.on('quiz-started', (data) => {
+            console.log('Quiz started event received:', data);
+
+            if (role === 'teacher') {
+                navigate(`/teacher-quiz/${quizCode}`, {
+                    state: { quizCode, role, quizTitle, quizDescription },
+                });
+            } else if (role === 'student') {
+                navigate(`/student-quiz/${quizCode}`, {
+                    state: { quizCode, role, quizTitle, quizDescription },
+                });
+            }
+        });
+
+        return () => {
+            socket.off('quiz-started'); // Cleanup listener
+        };
+    }, [role, quizCode, quizTitle, quizDescription, navigate]);
+
+
+
+
+    //old handleQuiz
 
     const handleQuiz = () => {
         if (quizCode) {
             socket.emit("start-quiz", { code: Number(quizCode) });
-            navigate(`/quiz/${quizCode}`); // Navigate to quiz component
+            // navigate(`/quiz/${quizCode}`); // just changed this, now navigation is in useEffect 
         } else {
             console.error("Cannot start quiz. Quiz code is missing.");
         }
     };
+
+
+
+
 
     return (
         <div className="roomID">
