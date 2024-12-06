@@ -15,7 +15,6 @@ const path = require("path");
 */
 const app = express();
 const port = process.env.PORT || 5000; 
-const SECRET_KEY = "comp229secretkey";
 
 app.use(express.json());
 app.use(cors());
@@ -62,7 +61,7 @@ app.post("/register", async (req, res) => {
     await usersCollection.insertOne({ username, email, password: hashedPassword, role });
     res.status(201).json({
       message: "User registered successfully",
-      user: { username, email, role }, // Optionally include user info
+      user: { username, email, role }, 
     });
   } catch (error) {
     console.error("Error registering user:", error);
@@ -153,38 +152,6 @@ app.put('/api/quizzes/:id', async (req, res) => {
   }
 });
 
-// Registration Route
-app.post("/register", async (req, res) => {
-  const { username, email, password, role } = req.body;
-
-  // Check for existing user
-  if (users.some(user => user.email === email || user.username === username)) {
-    return res.status(400).json("Email or Username is already taken.");
-  }
-
-  // Save new user with hashed password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  users.push({ username, email, password: hashedPassword, role });
-  res.status(201).json("User registered successfully");
-});
-
-// Login Route
-app.post("/login", async (req, res) => {
-  const { email, password, role } = req.body;
-  const user = users.find((u) => u.email === email && u.role === role);
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(400).json("Invalid credentials");
-  }
-
-  // Generate and return a JWT token
-  const token = jwt.sign(
-    { username: user.username, email: user.email, role: user.role },
-    SECRET_KEY,
-    { expiresIn: "1h" }
-  );
-  res.json({ token });
-});
 
 // Start the server 
 app.listen(port, () => {
