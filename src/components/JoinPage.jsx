@@ -1,10 +1,10 @@
-import { useState, useEffect} from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
 import "./styles/CreateQuiz.css"
 import './styles/JoinPage.css'
 
-let socket;
+// let socket; //this one existed early on
 function JoinPage() {
     const [code, setCode] = useState('');
     const [nickname, setNickname] = useState('');
@@ -12,37 +12,51 @@ function JoinPage() {
     const [error, setError] = useState('');
     const navigate = useNavigate()
     const socketUrl = import.meta.env.VITE_BE_SOCKET;
-    
+
     // Add Quiz to Quizzes field + transfer user data to another component
     const handleSubmit = async (e) => {
         e.preventDefault()
         setQuizzes(quizzes => quizzes + 1);
     }
 
+
+
+    //new joinQuiz which emits join-quiz-lobby which actually adds user to the lobby
+
     const joinQuiz = () => {
-        socket = io.connect(socketUrl);
-        socket.emit("send_code",  Number(code));
+        let socket;//to prevent new socket everytime
+        // Create a single socket connection if not already connected
+        if (!socket) {
+            socket = io.connect(socketUrl);
+        }
+
+        socket.emit("send_code", Number(code));
 
         socket.on('checkQuizCode', (response) => {
             if (response.isValid) {
+                // Emit 'join-quiz-lobby' before navigating
+                socket.emit('join-quiz-lobby', { code: Number(code), nickname });
+
                 navigate("/lobby", {
                     state: {
                         quizCode: code,
                         username: nickname,
                         role: "student",
                     },
-                });                
+                });
             } else {
                 setError('Invalid quiz code!');
             }
-        })
-    }
+        });
+    };
+
+    
     const openQRWindow = () => {
         alert("User gives access to camera to scan the QR Code") // open a camera to scan QR Code
     }
 
     const passRandomQuiz = () => {
-        navigate('/pass-random-quiz');  
+        navigate('/pass-random-quiz');
     };
 
     const displayPassedQuizzes = () => {
@@ -57,8 +71,8 @@ function JoinPage() {
                         <h3>Join Quiz</h3>
                         <label htmlFor="">
                             <strong>Enter CODE:</strong>
-                            <input type="text" className="code" placeholder="Enter quiz code" 
-                            value={code} onChange={(e) => setCode(e.target.value)} required/>
+                            <input type="text" className="code" placeholder="Enter quiz code"
+                                value={code} onChange={(e) => setCode(e.target.value)} required />
                         </label>
                         <label htmlFor="">
                             <strong>OR</strong>
@@ -66,8 +80,8 @@ function JoinPage() {
                         <button className="openQRCode" onClick={openQRWindow}>Scan QR Code</button>
                         <label htmlFor="">
                             <strong>Nickname:</strong>
-                            <input type="text"  placeholder="Enter your nickname" 
-                            value={nickname} onChange={(e) =>setNickname(e.target.value)} required />
+                            <input type="text" placeholder="Enter your nickname"
+                                value={nickname} onChange={(e) => setNickname(e.target.value)} required />
                         </label>
                         <button className="joinQuiz" onClick={joinQuiz}>Join Quiz</button>
                         <p>{error}</p>
@@ -76,7 +90,7 @@ function JoinPage() {
             </div>
 
             <div className="resultField">
-                
+
                 <fieldset className="passedQuizzes">
                     <h3>Quizzes</h3>
                     <p>This field should be table of passed quizzes in the future</p>
