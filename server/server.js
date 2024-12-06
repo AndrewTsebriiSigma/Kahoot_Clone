@@ -42,7 +42,7 @@ client.connect().then(() => {
   usersCollection = db.collection("users");
 });
 
-// Registration Route
+// Registration Route (does bcrypt)
 app.post("/register", async (req, res) => {
   const { username, email, password, role } = req.body;
   if (!username || !email || !password || !role) {
@@ -72,7 +72,7 @@ app.post("/register", async (req, res) => {
   }
 });
 
-// Login Route
+// Login Route (does bcrypt)
 app.post("/login", async (req, res) => {
   const { email, password, role } = req.body;
   const user = await usersCollection.findOne({ email });
@@ -132,20 +132,36 @@ app.delete('/api/quizzes/:id', async (req, res) => {
   }
 });
 
-// Get user role
+
+// route to get user role using token
+
 app.get('/api/users', async (req, res) => {
-  const {role} = req.body;
-  const user = await usersCollection.findOne({ role });
-  try {
-    if (user) {
-      res.json({role: user.role}) 
-    } else {
-      res.status(404).json({message: 'Impossible to find the role'})
-    } 
-  } catch (err) {
-      res.json({message: err})
+  const authHeader = req.headers.authorization;
+
+  // Check if the Authorization header is present
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ message: 'Authorization header missing or malformed' });
   }
-})
+
+  const token = authHeader.split(' ')[1]; // Extract the token from the header
+
+  try {
+    // Verify the token using the secret key
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    // Respond with the user's role and optionally other user details
+    res.status(200).json({
+      role: decoded.role,
+      username: decoded.username,
+      email: decoded.email,
+    });
+  } catch (err) {
+    console.error('Error verifying token:', err);
+    res.status(403).json({ message: 'Invalid or expired token' });
+  }
+});
+
+
 
 // update an existing quiz 
 app.put('/api/quizzes/:id', async (req, res) => {
@@ -168,38 +184,7 @@ app.put('/api/quizzes/:id', async (req, res) => {
   }
 });
 
-// Registration Route
-app.post("/register", async (req, res) => {
-  const { username, email, password, role } = req.body;
 
-  // Check for existing user
-  if (users.some(user => user.email === email || user.username === username)) {
-    return res.status(400).json("Email or Username is already taken.");
-  }
-
-  // Save new user with hashed password
-  const hashedPassword = await bcrypt.hash(password, 10);
-  users.push({ username, email, password: hashedPassword, role });
-  res.status(201).json("User registered successfully");
-});
-
-// Login Route
-app.post("/login", async (req, res) => {
-  const { email, password, role } = req.body;
-  const user = users.find((u) => u.email === email && u.role === role);
-
-  if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(400).json("Invalid credentials");
-  }
-
-  // Generate and return a JWT token
-  const token = jwt.sign(
-    { username: user.username, email: user.email, role: user.role },
-    SECRET_KEY,
-    { expiresIn: "1h" }
-  );
-  res.json({ token });
-});
 
 // Start the server 
 app.listen(port, () => {
