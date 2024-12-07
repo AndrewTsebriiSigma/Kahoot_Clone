@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
-import "./styles/CreateQuiz.css"
-import logo from "../assets/logo.jpg"
+import './styles/CreateQuiz.css';
+import logo from '../assets/logo.jpg';
 
 function CreateQuiz() {
   const apiUrl = import.meta.env.VITE_BE_URL;
@@ -23,10 +23,24 @@ function CreateQuiz() {
   const [editQuestionIndex, setEditQuestionIndex] = useState(null);
 
   useEffect(() => {
+    console.log("Received quiz:", quizToEdit);
     if (quizToEdit) {
       setTitle(quizToEdit.title);
       setDescription(quizToEdit.description);
-      setQuestions(quizToEdit.questions || []);
+  
+      // get the quiz questions to the expected structure
+      const formattedQuestions = quizToEdit.questions.map((q) => ({
+        questionText: q.question,  
+        options: {
+          A: q.options[0],  
+          B: q.options[1],
+          C: q.options[2],
+          D: q.options[3]
+        },
+        correctAnswer: q.correctAnswer
+      }));
+  
+      setQuestions(formattedQuestions);
     }
   }, [quizToEdit]);
 
@@ -36,9 +50,14 @@ function CreateQuiz() {
   const handleOptionChange = (option, value) => {
     setOptions((prevOptions) => ({ ...prevOptions, [option]: value }));
   };
-  const handleCorrectAnswerChange = (e) => setCorrectAnswer(e.target.value);
 
-  // Add or update a question 
+  const handleCorrectAnswerChange = (e) => {
+    const selectedAnswer = e.target.value;
+    const index = ['A', 'B', 'C', 'D'].indexOf(selectedAnswer);
+    setCorrectAnswer({ letter: selectedAnswer, index });
+  };
+
+  // Add or update a question
   const handleSaveQuestion = () => {
     if (
       questionText &&
@@ -46,32 +65,33 @@ function CreateQuiz() {
       options.B &&
       options.C &&
       options.D &&
-      correctAnswer
+      correctAnswer.letter 
     ) {
+      const newQuestion = {
+        questionText,
+        options: {
+          A: options.A,
+          B: options.B,
+          C: options.C,
+          D: options.D,
+        },
+        correctAnswer,
+      };
+
       if (isEditing) {
-        // update the existing question
         const updatedQuestions = [...questions];
-        updatedQuestions[editQuestionIndex] = {
-          questionText,
-          options,
-          correctAnswer,
-        };
+        updatedQuestions[editQuestionIndex] = newQuestion;
         setQuestions(updatedQuestions);
         setIsEditing(false);
         setEditQuestionIndex(null);
       } else {
-        // add a new question
-        const newQuestion = {
-          questionText,
-          options,
-          correctAnswer,
-        };
         setQuestions([...questions, newQuestion]);
       }
 
+      
       setQuestionText('');
       setOptions({ A: '', B: '', C: '', D: '' });
-      setCorrectAnswer('');
+      setCorrectAnswer({ letter: '', index: -1 });
     } else {
       alert('Please fill in all fields for the question and options.');
     }
@@ -84,15 +104,15 @@ function CreateQuiz() {
     setEditQuestionIndex(index);
     setQuestionText(questionToEdit.questionText);
     setOptions(questionToEdit.options);
-    setCorrectAnswer(questionToEdit.correctAnswer);
+    setCorrectAnswer(questionToEdit.correctAnswer || { letter: '', index: -1 });
   };
 
-  // delete a question 
+  // delete a question
   const handleDeleteQuestion = (index) => {
     setQuestions(questions.filter((_, idx) => idx !== index));
   };
 
-  // save the entire quiz (create or update) 
+  // save the entire quiz (create or update)
   const handleSaveQuiz = async () => {
     if (!title || !description || questions.length === 0) {
       alert('Please fill in all quiz details and add at least one question.');
@@ -105,25 +125,26 @@ function CreateQuiz() {
         title,
         description,
         isValid: true,
-        questions: questions.map((question, index) => ({
+        questions: questions.map((question) => ({
           question: question.questionText,
           options: [question.options.A, question.options.B, question.options.C, question.options.D],
-          index,
+          correctAnswer: question.correctAnswer,
         })),
       };
 
       console.log('Formatted Quiz:', formatted);
 
       if (quizToEdit) {
-        // update existing quiz
+        // Update existing quiz
         await axios.put(`${apiUrl}/api/quizzes/${quizToEdit._id}`, formatted);
         alert('Quiz updated successfully!');
       } else {
-        // create a new quiz
+        // Create a new quiz
         await axios.post(`${apiUrl}/api/quizzes`, formatted);
         alert('Quiz created successfully!');
       }
 
+      // reset form and navigate
       setTitle('');
       setDescription('');
       setQuestions([]);
@@ -134,7 +155,6 @@ function CreateQuiz() {
     }
   };
 
-
   return (
     <div className='main'>
       <div className="header">
@@ -142,17 +162,13 @@ function CreateQuiz() {
         <h2>{quizToEdit ? 'Edit Quiz' : 'Create Quiz'}</h2>
 
         <div className='info'>
-          <div >
-            <label>
-              Quiz Title:</label>
+          <div>
+            <label>Quiz Title:</label>
             <input type="text" value={title} onChange={handleTitleChange} />
-
           </div>
           <div>
-            <label>
-              Description:</label>
+            <label>Description:</label>
             <textarea value={description} onChange={handleDescriptionChange} />
-
           </div>
         </div>
       </div>
@@ -161,51 +177,43 @@ function CreateQuiz() {
       <div className="bigDiv">
         <div className="make-question">
           <div className='question'>
-
-            <input style={{ width: 600 }}
+            <input
+              style={{ width: 600 }}
               type="text"
               value={questionText}
               onChange={handleQuestionChange}
               placeholder='Start typing your question'
             />
-
           </div>
           <div className='options'>
-
             <input
               placeholder='Enter option A'
               type="text"
-              value={options.A}
+              value={options?.A} 
               onChange={(e) => handleOptionChange('A', e.target.value)}
             />
-
-
             <input
               placeholder='Enter option B'
               type="text"
-              value={options.B}
+              value={options?.B }
               onChange={(e) => handleOptionChange('B', e.target.value)}
             />
-
-
             <input
               placeholder='Enter option C'
               type="text"
-              value={options.C}
+              value={options?.C}
               onChange={(e) => handleOptionChange('C', e.target.value)}
             />
-
             <input
               placeholder='Enter option D'
               type="text"
-              value={options.D}
+              value={options?.D }
               onChange={(e) => handleOptionChange('D', e.target.value)}
             />
-
           </div>
           <div style={{ color: "white", padding: '5px', background: 'black', opacity: '0.7', borderRadius: '5px' }}>
             <label>Correct Answer:
-              <select value={correctAnswer} onChange={handleCorrectAnswerChange}>
+              <select value={correctAnswer?.letter || ''} onChange={handleCorrectAnswerChange}>
                 <option value="">Select correct answer</option>
                 <option value="A">A</option>
                 <option value="B">B</option>
@@ -218,6 +226,7 @@ function CreateQuiz() {
             {isEditing ? 'Update Question' : 'Save Question'}
           </button>
         </div>
+
         <div className="questions">
           <h3>Questions</h3>
           {questions.length === 0 ? (
@@ -234,7 +243,7 @@ function CreateQuiz() {
                       <li>C: {question.options.C}</li>
                       <li>D: {question.options.D}</li>
                     </ul>
-                    <p>Correct Answer: {question.correctAnswer}</p>
+                    <p>Correct Answer: {question.correctAnswer.letter} (Index: {question.correctAnswer.index})</p>
                     <div className="save-edit">
                       <button onClick={() => handleEditQuestion(index)}>Edit</button>
                       <button className='delete' onClick={() => handleDeleteQuestion(index)}>Delete</button>
@@ -249,6 +258,6 @@ function CreateQuiz() {
       <button className='create-quiz-button' onClick={handleSaveQuiz}>{quizToEdit ? 'Save Changes' : 'Create Quiz'}</button>
     </div>
   );
-};
+}
 
 export default CreateQuiz;
