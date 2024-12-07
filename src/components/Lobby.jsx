@@ -11,6 +11,8 @@ function Lobby() {
     const [buttonAvailable, setButtonAvailable] = useState(false);
     const [players, setPlayers] = useState([]);
     const [role, setRole] = useState("");
+    const [quizData, setQuizData] = useState(null);     //h add
+
 
     const location = useLocation();
     const navigate = useNavigate();
@@ -30,8 +32,8 @@ function Lobby() {
         // Emit event to create quiz lobby
         socket.emit("create-quiz-lobby", { code: Number(quizCode) });
 
-      
-        //new one
+
+        //player-joined event
         socket.on("player-joined", (data) => {
             console.log(`player join received by client socket id: ${socket.id}:`, data);
             setPlayers((prevPlayers) => {
@@ -80,44 +82,95 @@ function Lobby() {
         console.log(role)
     }, []);
 
+
+    //useEffect that makes start quiz button available
     useEffect(() => {
         console.log("role", role, "playercount", playerCounter)
         setButtonAvailable(role === "teacher" && playerCounter > 0);
     }, [role, playerCounter]);
 
 
+    //useEffect to fetch quizData only if role == teacher   h add
+    useEffect(() => {
+        const fetchQuizData = async () => {
+            try {
+                const response = await fetch(`${apiUrl}/quiz/${quizCode}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    setQuizData(data.questions); // Assuming questions are an array
+                    console.log("Quiz data fetched:", data.questions);
+                    console.log(`data: `, data)
+                } else {
+                    console.error("Failed to fetch quiz data.");
+                }
+            } catch (error) {
+                console.error("Error fetching quiz data:", error);
+            }
+        };
 
-    //useEffect that listens quiz-started and does role based navigation
+        if (role === "teacher" && quizCode) {
+            fetchQuizData();
+        }
+    }, [role, quizCode]);
 
+
+    //useEffect just to check updated quizData state
+    useEffect(() => {
+        console.log("Updated quizData state:", quizData);
+    }, [quizData]);
+
+
+
+    //useEffect that listens quiz-started and does role based navigation and passes quizData through state
     useEffect(() => {
         socket.on('quiz-started', (data) => {
             console.log('Quiz started event received:', data);
 
-            if (role === 'teacher') {
-                navigate(`/teacher-quiz/${quizCode}`, {
-                    state: { quizCode, role, quizTitle, quizDescription },
-                });
-            } else if (role === 'student') {
-                navigate(`/student-quiz/${quizCode}`, {
-                    state: { quizCode, role, quizTitle, quizDescription },
-                });
-            }
-        });
+            const { quizData: receivedQuizData } = data;
 
+            if(receivedQuizData && receivedQuizData.length > 0){
+                if(role == 'teacher'){
+                    console.log(`Navigating to TeacherQuiz with state:`, {
+                        quizCode,
+                        role,
+                        quizData: receivedQuizData,
+                    });
+                    navigate(`/teacher-quiz/${quizCode}`, {
+                        state: { quizCode, role, quizTitle, quizDescription, quizData: receivedQuizData },
+                    })
+                }else if(role == 'student'){
+                    console.log(`Navigating to StudentQuiz with state:`, {
+                        quizCode,
+                        role,
+                        quizData: receivedQuizData,
+                    })
+                    navigate(`/student-quiz/${quizCode}`, {
+                        state: { quizCode, role, quizTitle, quizDescription, quizData: receivedQuizData },
+                    })
+
+                }
+            }
+            else {
+                console.error("Quiz data not ready. Delaying navigation...");
+            }
+
+        });
+        
         return () => {
             socket.off('quiz-started'); // Cleanup listener
         };
-    }, [role, quizCode, quizTitle, quizDescription, navigate]);
+    }, [role, quizCode, quizTitle, quizDescription, navigate]);       //h add or remove quizData 
+    
+  
 
 
 
 
-    //old handleQuiz
+    //old handleQuiz(stays same)
 
     const handleQuiz = () => {
         if (quizCode) {
             socket.emit("start-quiz", { code: Number(quizCode) });
-            // navigate(/quiz/${quizCode}); // just changed this, now navigation is in useEffect 
         } else {
             console.error("Cannot start quiz. Quiz code is missing.");
         }
@@ -127,7 +180,7 @@ function Lobby() {
 
 
 
-    //
+
 
     return (
         <div className="roomID">
@@ -156,4 +209,4 @@ function Lobby() {
     );
 }
 
-export default Lobby;
+export default Lobby;
