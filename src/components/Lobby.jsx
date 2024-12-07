@@ -4,18 +4,18 @@ import io from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
 
 const socket = io.connect(import.meta.env.VITE_BE_SOCKET);
-
+const apiUrl = import.meta.env.VITE_BE_URL;
 
 function Lobby() {
     const [playerCounter, setPlayerCounter] = useState(0);
     const [buttonAvailable, setButtonAvailable] = useState(false);
     const [players, setPlayers] = useState([]);
+    const [role, setRole] = useState("");
 
     const location = useLocation();
     const navigate = useNavigate();
     const quizCode = location.state?.quizCode;
     const userName = location.state?.username;
-    const userRole = location.state?.role;
     const quizTitle = location.state?.quizTitle;
     const quizDescription = location.state?.quizDescription;
 
@@ -40,8 +40,7 @@ function Lobby() {
             setPlayerCounter(data.playerCount)
         });
 
-
-        //clean event listeners on component unmount
+        // clean event listeners on component unmount
         return () => {
             socket.off("player-joined");
         };
@@ -50,37 +49,75 @@ function Lobby() {
 
     //New useEffects for fetching token stored in local storage and then setting the approp role for user
     useEffect(() => {
-        // Fetch user role (teacher or student)
         const fetchRole = async () => {
+            const token = localStorage.getItem("token");
+
+            if (!token) {
+                console.error("No token found. User not authenticated.");
+                return;
+            }
+
             try {
                 const response = await fetch(`${apiUrl}/api/users`, {
                     method: 'GET',
-                    body: JSON.stringify({ role })
-                });  
-                const data = await response.json();
-        
-                if (response.ok) {  
-                    setRole(data.role);  
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    setRole(data.role);
                 } else {
-                    console.log('Something went wrong...');
+                    console.error("Failed to fetch role. Please check the backend or token validity.");
                 }
             } catch (err) {
-                console.log('Error fetching role:', err);  
+                console.error("Error fetching role:", err);
             }
-        };        
+        };
+
         fetchRole();
-        // update button availability when role or player count changes
-        if (role === "teacher" && playerCounter > 0) {
-            setButtonAvailable(true);
-        } else {
-            setButtonAvailable(false);
-        }
-    }, [role, playerCounter]);  
+        console.log(role)
+    }, []);
+
+    useEffect(() => {
+        console.log("role", role, "playercount", playerCounter)
+        setButtonAvailable(role === "teacher" && playerCounter > 0);
+    }, [role, playerCounter]);
+
+
+
+    //useEffect that listens quiz-started and does role based navigation
+
+    useEffect(() => {
+        socket.on('quiz-started', (data) => {
+            console.log('Quiz started event received:', data);
+
+            if (role === 'teacher') {
+                navigate(`/teacher-quiz/${quizCode}`, {
+                    state: { quizCode, role, quizTitle, quizDescription },
+                });
+            } else if (role === 'student') {
+                navigate(`/student-quiz/${quizCode}`, {
+                    state: { quizCode, role, quizTitle, quizDescription },
+                });
+            }
+        });
+
+        return () => {
+            socket.off('quiz-started'); // Cleanup listener
+        };
+    }, [role, quizCode, quizTitle, quizDescription, navigate]);
+
+
+
+
+    //old handleQuiz
 
     const handleQuiz = () => {
         if (quizCode) {
             socket.emit("start-quiz", { code: Number(quizCode) });
-            // navigate(`/quiz/${quizCode}`); // just changed this, now navigation is in useEffect 
+            // navigate(/quiz/${quizCode}); // just changed this, now navigation is in useEffect 
         } else {
             console.error("Cannot start quiz. Quiz code is missing.");
         }
@@ -112,13 +149,11 @@ function Lobby() {
                 </ul>
             </div>
 
-            {userRole === "teacher" && (
-                <button disabled={!buttonAvailable} onClick={handleQuiz}>
-                    Start Quiz
-                </button>
-            )}
+            <button disabled={!buttonAvailable} onClick={handleQuiz}>
+                Start Quiz
+            </button>
         </div>
     );
 }
 
-export default Lobby;
+export default Lobby;
