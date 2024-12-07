@@ -111,11 +111,54 @@ io.on("connection", (socket) => {
       } else {
         socket.emit('checkQuizCode', { isValid: false });
       }
+
+
+      //h add broadcasting data to everyone in room
+      io.to(code).emit("quiz-started", {
+        message: "The quiz has started!",
+        quizData: quiz.questions, // Send only questions
+    });
+
+    console.log(`Broadcasted quizData to room ${code}`);
     } catch (err) {
       console.error("Error querying database:", err);
       socket.emit('checkQuizCode', { isValid: false });
     }
   });
+
+
+
+
+//handling send-question event coming TeacherQuiz and then emitting question to sockets in lobby (to StudentQuiz)   (h add)
+socket.on("send-question", ({ code, question }) => {
+  if (!code || !question) {
+      console.error("Invalid data received for send-question:", { code, question });
+      return;
+  }
+
+  console.log(`Broadcasting question for quiz ${code}:`, question);
+
+  // Emit the question to all users in the quiz room
+  io.to(code).emit("send-question", { question });
+});
+
+
+//handling student-response received from StudentQuiz and emitting it
+socket.on("student-response", ({ code, answer, studentId }) => {
+  if (!code || !answer || !studentId) {
+      console.error("Invalid data received for student-response:", { code, answer, studentId });
+      return;
+  }
+
+  console.log(`Student ${studentId} answered quiz ${code}: ${answer}`);
+
+  // Optionally forward the response to the teacher for real-time updates
+  io.to(code).emit("student-response", { studentId, answer });
+});
+
+
+
+
 
   socket.on('disconnect', () => {
     console.log('User disconnected:', socket.id);
