@@ -32,7 +32,7 @@ h2 {
 h3 {
   font-size: 1rem;
   margin-bottom: 20px;
-  color: #666;
+  color: #ffffff;
 }
 
 input[type="text"],
@@ -103,7 +103,7 @@ footer a:hover {
 }
 
 a {
-  color: #2575fc;
+  color: #ffffff;
   text-decoration: none;
 }
 
