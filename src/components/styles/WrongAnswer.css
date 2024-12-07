@@ -1,0 +1,14 @@
+.displayWrong {
+    background-color: rgb(220, 34, 34);
+    padding: 50px;
+    padding-left: 100px;
+    padding-right: 100px;
+    color: white;
+}
+
+.wrongMessage {
+    background-color: rgb(54, 52, 52);
+    color: white;
+    text-align: center;
+    padding: 1px;
+}

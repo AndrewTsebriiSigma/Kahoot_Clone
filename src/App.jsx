@@ -12,6 +12,8 @@ import PassRandomQuiz from './components/PassRandomQuiz.jsx';
 import PassRandomQuizResults from './components/PassRandomQuizResults.jsx';
 import StudentQuiz from './Components/StudentQuiz.jsx';
 import TeacherQuiz from './Components/TeacherQuiz.jsx';
+import RightAnswer from './components/RightAnswer.jsx';
+import WrongAnswer from './components/WrongAnswer.jsx';
 
 function App() {
   return (
@@ -32,6 +34,8 @@ function App() {
             <Route path="/create-quiz" element={<CreateQuiz />} />
             <Route path="/teacher-quiz/:quizCode" element={<TeacherQuiz />} />
             <Route path="/student-quiz/:quizCode" element={<StudentQuiz />} />
+            <Route path="/right-answer" element={<RightAnswer/>}/>
+            <Route path="/wrong-answer" element={<WrongAnswer/>}/>
           </Routes>
         </div>
       </Router>

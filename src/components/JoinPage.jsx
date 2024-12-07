@@ -60,7 +60,7 @@ function JoinPage() {
     };
 
     const displayPassedQuizzes = () => {
-        // if quiz starts, automatically display it in passedQuizzes fieldset
+        // if quiz starts, automatically display it in passedQuizzes fieldset Part 4
     }
 
     return (
