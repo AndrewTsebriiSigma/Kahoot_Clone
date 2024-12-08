@@ -126,47 +126,67 @@ function Lobby() {
         socket.on('quiz-started', (data) => {
             console.log('Quiz started event received:', data);
 
-            const { quizData: receivedQuizData } = data;
+            // if(quizData && quizData.length>0){
+            //     if(role == 'teacher'){
+            //         console.log(`Navigating to TeacherQuiz with state:`, {
+            //             quizCode,
+            //             role,
+            //             quizData,
+            //         });
+            //         navigate(`/teacher-quiz/${quizCode}`, {
+            //             state: { quizCode, role, quizTitle, quizDescription, quizData },
+            //         })
+            //     }else if(role == 'student'){
+            //         console.log(`Navigating to StudentQuiz with state:`, {
+            //             quizCode,
+            //             role,
+            //             quizData,
+            //         })
+            //         navigate(`/student-quiz/${quizCode}`, {
+            //             state: { quizCode, role, quizTitle, quizDescription, quizData },
+            //         })
 
-            if(receivedQuizData && receivedQuizData.length > 0){
-                if(role == 'teacher'){
-                    console.log(`Navigating to TeacherQuiz with state:`, {
-                        quizCode,
-                        role,
-                        quizData: receivedQuizData,
-                    });
-                    navigate(`/teacher-quiz/${quizCode}`, {
-                        state: { quizCode, role, quizTitle, quizDescription, quizData: receivedQuizData },
-                    })
-                }else if(role == 'student'){
-                    console.log(`Navigating to StudentQuiz with state:`, {
-                        quizCode,
-                        role,
-                        quizData: receivedQuizData,
-                    })
-                    navigate(`/student-quiz/${quizCode}`, {
-                        state: { quizCode, role, quizTitle, quizDescription, quizData: receivedQuizData },
-                    })
-
-                }
-            }
-            else {
-                console.error("Quiz data not ready. Delaying navigation...");
-            }
+            //     }
+            // }
+            // else {
+            //     console.error("Quiz data not ready. Delaying navigation...");
+            // }
 
         });
         
+        if (role === 'teacher') {
+            if (quizData && quizData.length > 0) {
+                console.log(`Navigating to TeacherQuiz with state:`, {
+                    quizCode,
+                    role,
+                    quizData,
+                });
+    
+                navigate(`/teacher-quiz/${quizCode}`, {
+                    state: { quizCode, role, quizTitle, quizDescription, quizData },
+                });
+            } else {
+                console.error("Quiz data not ready. Delaying navigation...");
+            }
+        } else if (role === 'student') {
+            navigate(`/student-quiz/${quizCode}`, {
+                state: { quizCode, role, quizTitle, quizDescription, quizData },
+            });
+        }
         return () => {
             socket.off('quiz-started'); // Cleanup listener
         };
-    }, [role, quizCode, quizTitle, quizDescription, navigate]);       //h add or remove quizData 
-    
-  
+        
+    }, [role, quizCode, quizTitle, quizDescription, quizData, navigate]);       //h add quizData 
 
 
 
 
-    //old handleQuiz(stays same)
+
+
+
+
+    //old handleQuiz
 
     const handleQuiz = () => {
         if (quizCode) {
@@ -202,7 +222,7 @@ function Lobby() {
                 </ul>
             </div>
 
-            <button disabled={!buttonAvailable} onClick={handleQuiz}>
+            <button disabled={!buttonAvailable} onClick={handleQuiz} style={{display: role== "student" ? 'none': 'block'}}>
                 Start Quiz
             </button>
         </div>
