@@ -1,7 +1,7 @@
 # Kahoot Clone: QuizMaster
 
 ## Instructions with the deployed project
-- Open https://kahoot-clonee.onrender.com/
+- Open [https://kahoot-clonee.onrender.com/](https://kahoot-clonee.onrender.com)
 - Create an account as a teacher
   - Login into this account
   - In Quizzes page, feel free to create a new quiz, or update existing quizzes or delete a quiz
