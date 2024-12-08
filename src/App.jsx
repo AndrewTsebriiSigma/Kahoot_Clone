@@ -11,7 +11,7 @@ import PassRandomQuizSetup from './components/PassRandomQuizSetup.jsx';
 import PassRandomQuiz from './components/PassRandomQuiz.jsx';
 import PassRandomQuizResults from './components/PassRandomQuizResults.jsx';
 import StudentQuiz from './Components/StudentQuiz.jsx';
-import TeacherQuiz from './Components/TeacherQuiz.jsx';
+import TeacherQuiz from './components/TeacherQuiz.jsx';
 import RightAnswer from './components/RightAnswer.jsx';
 import WrongAnswer from './components/WrongAnswer.jsx';
 

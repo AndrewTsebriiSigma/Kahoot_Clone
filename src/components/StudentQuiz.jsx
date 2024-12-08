@@ -10,7 +10,9 @@ function StudentQuiz() {
     const { quizCode } = useParams(); 
     const [question, setQuestion] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
-    const [isLocked, setIsLocked] = useState(false); 
+    const [isLocked, setIsLocked] = useState(false);
+    const [correctOption, setCorrectOption] = useState(null);
+
 
     useEffect(() => {
         console.log(`useEffect ran`)
@@ -19,7 +21,8 @@ function StudentQuiz() {
             console.log("Question received in StudentQuiz:", data);
             setQuestion(data.question);
             setSelectedOption(null); 
-            setIsLocked(false); 
+            setIsLocked(false);
+            setCorrectOption(question.options[question.index]);
         });
 
         return () => {
@@ -41,6 +44,14 @@ function StudentQuiz() {
             });
         }
     };
+
+    useEffect(() => {
+        if (selectedOption != null && selectedOption === correctOption) {
+            navigate('/right-answer')
+        } else {
+            navigate('/wrong-answer')
+        }
+    }, []);
 
     return (
         <div className="student-quiz">
