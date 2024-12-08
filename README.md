@@ -9,17 +9,26 @@
   - The lobby page show the quiz code and a QRCode
 - On another browser, create an account as a student 
   - Login into this account
-  - Type the quiz code (or scan qr code) provided by the teacher lobby and a username
+  - Type the quiz code (qr code not working yet) provided by the teacher lobby and a username
   - Click on "Join Quiz" button
-- Now that at least one student joined, go back to the teacher account and click on "Start"
 
 ## Screenshots and decriptions
+Login page where the user clicks on "Create" to create the teacher or student account
 ![Login page where the user clicks on "Create" to create the teacher or student account](image.png)
+Quizzes page for TEACHER, where he can create a new quiz, update an existing one, delete a quiz, and start a quiz
 ![Quizzes page for TEACHER, where he can create a new quiz, update an existing one, delete a quiz, and start a quiz](image-1.png)
+Create quiz page
 ![Create quiz page](image-2.png)
+Edit quiz page
 ![Edit quiz page](image-3.png)
+After TEACHER clicks in "Start" for a quiz
 ![After TEACHER clicks in "Start" for a quiz](image-4.png)
-![After STUDENT logins, this is the Join Page - student should type the code or scan the QRcode](image-5.png)
+After STUDENT logins, this is the Join Page - student should type the code
+![After STUDENT logins, this is the Join Page - student should type the code ](image-5.png)
+After STUDENT clicks in Join Quiz
+![After STUDENT clicks in Join Quiz](https://github.com/user-attachments/assets/2adb1f4f-4a6b-4ddc-b9bf-9f58ed15cf1e)
+*now we are having a problem with the student quiz (quiz does not start), but teacher quiz start
+![image](https://github.com/user-attachments/assets/780a72af-e9f2-4404-b612-b4e2e3b72f87)
 
 
 
