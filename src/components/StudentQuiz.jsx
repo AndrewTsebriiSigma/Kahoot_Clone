@@ -11,6 +11,7 @@ function StudentQuiz() {
     const [question, setQuestion] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const [isLocked, setIsLocked] = useState(false);
+    const [remainingTime, setRemainingTime] = useState(20);
     const [correctOption, setCorrectOption] = useState(null);
 
 
@@ -44,6 +45,32 @@ function StudentQuiz() {
             });
         }
     };
+
+    // Timer logic
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setRemainingTime((prevTime) => prevTime - 1);
+    }, 1000);
+
+    if (remainingTime <= 0) {
+      setIsAllAnswered(true);
+      clearInterval(timer);
+    }
+
+    // Check if all students have answered
+  useEffect(() => {
+    const totalStudents = Object.values(responses).reduce((acc, count) => acc + count, 0);
+    const totalExpectedResponses = quizData[currentQuestionIndex]?.totalStudents || 0;
+
+    if (totalStudents === totalExpectedResponses) {
+      setIsAllAnswered(true);
+      setRemainingTime(0); // Stop timer early if all students have answered
+    }
+  }, [responses, currentQuestionIndex, quizData]);
+
+    return () => clearInterval(timer);
+  }, [remainingTime]);
+
 
     useEffect(() => {
         if (selectedOption != null && selectedOption === correctOption) {
