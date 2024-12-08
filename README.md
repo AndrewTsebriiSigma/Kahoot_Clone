@@ -11,6 +11,9 @@
   - Login into this account
   - Type the quiz code (qr code not working yet) provided by the teacher lobby and a username
   - Click on "Join Quiz" button
+- After, go back to the teacher browser to that the number of Players updated and click on "Start Quiz"
+- Teacher page will show the first question and Next Question button (working)
+- Student page will NOT work correctly since we are still working on it.
 
 ## Screenshots and decriptions
 Login page where the user clicks on "Create" to create the teacher or student account
