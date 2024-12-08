@@ -152,16 +152,15 @@ function Lobby() {
             //     console.error("Quiz data not ready. Delaying navigation...");
             // }
 
-        });
-        
-        if (role === 'teacher') {
+            
+            if (role === 'teacher') {
             if (quizData && quizData.length > 0) {
                 console.log(`Navigating to TeacherQuiz with state:`, {
                     quizCode,
                     role,
                     quizData,
                 });
-    
+                
                 navigate(`/teacher-quiz/${quizCode}`, {
                     state: { quizCode, role, quizTitle, quizDescription, quizData },
                 });
@@ -173,6 +172,7 @@ function Lobby() {
                 state: { quizCode, role, quizTitle, quizDescription, quizData },
             });
         }
+    });
         return () => {
             socket.off('quiz-started'); // Cleanup listener
         };
