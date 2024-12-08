@@ -31,7 +31,8 @@ Teacher view/ Student view
 ![WhatsApp Image 2024-12-07 at 22 16 42_8dc66964](https://github.com/user-attachments/assets/118aa446-ec82-4210-9d50-5021b30d63da)
 *now we are having a problem with the student quiz (quiz does not start), but teacher quiz start
 ![image](https://github.com/user-attachments/assets/780a72af-e9f2-4404-b612-b4e2e3b72f87)
-
+Student view after teacher start quiz
+![image](https://github.com/user-attachments/assets/bbf0a40e-3344-488b-bac9-90d36d592df5)
 
 
 ## Instructions to run in the repository
