@@ -1,19 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './components/Login.jsx'
-import Registration from './components/Registration.jsx'
-import Quizzes from './components/Quizzes.jsx'
-import CreateQuiz from './components/CreateQuiz.jsx'
-import JoinPage from './components/JoinPage.jsx'
-import Lobby from './components/Lobby.jsx'
+import Login from './Components/Login.jsx'
+import Registration from './Components/Registration.jsx'
+import Quizzes from './Components/Quizzes.jsx'
+import CreateQuiz from './Components/CreateQuiz.jsx'
+import JoinPage from './Components/JoinPage.jsx'
+import Lobby from './Components/Lobby.jsx'
 import PassRandomQuizDasboard from './components/PassRandomQuizDashboard.jsx';
-import PassRandomQuizSetup from './components/PassRandomQuizSetup.jsx';
-import PassRandomQuiz from './components/PassRandomQuiz.jsx';
-import PassRandomQuizResults from './components/PassRandomQuizResults.jsx';
+import PassRandomQuizSetup from './Components/PassRandomQuizSetup.jsx';
+import PassRandomQuiz from './components/PassRandomQuizDashboard.jsx';
+import PassRandomQuizResults from './Components/PassRandomQuizResults.jsx';
 import StudentQuiz from './Components/StudentQuiz.jsx';
-import TeacherQuiz from './components/TeacherQuiz.jsx';
-import RightAnswer from './components/RightAnswer.jsx';
-import WrongAnswer from './components/WrongAnswer.jsx';
+import TeacherQuiz from './Components/TeacherQuiz.jsx';
+import RightAnswer from './Components/RightAnswer.jsx';
+import WrongAnswer from './Components/WrongAnswer.jsx';
+import StudentFinalScore from './Components/StudentFinalScore.jsx';
+import FinalScoreboard from './Components/FinalScoreboard.jsx';
 
 function App() {
   return (
@@ -36,6 +38,8 @@ function App() {
             <Route path="/student-quiz/:quizCode" element={<StudentQuiz />} />
             <Route path="/right-answer" element={<RightAnswer/>}/>
             <Route path="/wrong-answer" element={<WrongAnswer/>}/>
+            <Route path="/student-final-score" element={<StudentFinalScore/>}/>
+            <Route path="/final-scoreboard" element={<FinalScoreboard/>}/>
           </Routes>
         </div>
       </Router>

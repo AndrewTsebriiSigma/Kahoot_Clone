@@ -14,7 +14,6 @@ function Lobby() {
     const [playerCounter, setPlayerCounter] = useState(0);
     const [buttonAvailable, setButtonAvailable] = useState(false);
     const [players, setPlayers] = useState([]);
-    // const [role, setRole] = useState("");
     const [quizData, setQuizData] = useState(null);     //h add
 
 
@@ -68,10 +67,6 @@ function Lobby() {
         });
 
     }, [playerCounter])
-
-
-
-
 
 
 
@@ -145,8 +140,8 @@ function Lobby() {
     }, [quizData]);
 
 
+    
     //old handleQuiz
-
     const handleQuiz = () => {
         if (quizCode) {
             socket.emit("start-quiz", { quizCode: Number(quizCode), quizData });

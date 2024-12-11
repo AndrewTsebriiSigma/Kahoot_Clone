@@ -38,6 +38,12 @@ const io = new Server(server, {
 
 let lobbies;
 
+
+//scoring system
+let scores = []; 
+let pointsAvailable = 1000; 
+let currentQuestionIndex = 0; 
+
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
 
@@ -78,6 +84,7 @@ io.on("connection", (socket) => {
 
   // student joins the quiz lobby  
   socket.on('join-quiz-lobby', ({ quizCode, username }) => {
+    socket.username = username;
     if (!quizCode || !username) {
       console.error('Invalid data received for join-quiz-lobby:', { quizCode, username });
       return;
@@ -126,67 +133,73 @@ io.on("connection", (socket) => {
     
     console.log(`Quiz started for code: ${quizCode}, lobbies: ${lobbies}`);
     // notify all users in the quiz room
-    io.to(lobbies).emit('quiz-started', { message: 'The quiz has started!',quizCode, quizData });
+    io.to(lobbies).emit('quiz-started', { message: 'The quiz has started!', quizCode, quizData });
   });
 
-  //send student to the lobby
-  // socket.on("send_code", async (code) => {
-  //   console.log("Received quiz code:", code);
-  //   try {
-  //     const quiz = await quizzesCollection.findOne({ quizId: Number(code) });
+  
 
-  //     if (quiz && quiz.isValid) {
-  //       socket.emit('checkQuizCode', { isValid: true });
-  //     } else {
-  //       socket.emit('checkQuizCode', { isValid: false });
-  //     }
-
-
-  //     //h add broadcasting data to everyone in room
-  //     io.to(code).emit("quiz-started", {
-  //       message: "The quiz has started!",
-  //       quizData: quiz.questions, // Send only questions
-  //     });
-
-  //     console.log(`Broadcasted quizData to room ${code}`);
-  //   } catch (err) {
-  //     console.error("Error querying database:", err);
-  //     socket.emit('checkQuizCode', { isValid: false });
-  //   }
-  // });
-
-
-
-
-  //handling send-question event coming TeacherQuiz and then emitting question to sockets in lobby (to StudentQuiz)   (h add)
-  socket.on("send-question", ({ code, question }) => {
-    if (!code || !question) {
-      console.error("Invalid data received for send-question:", { code, question });
+  //handling send-question event coming TeacherQuiz (for next question) and then emitting question to sockets in lobby (to StudentQuiz)   (h add)
+  socket.on("send-question", ({ quizCode, question }) => {
+    if (!quizCode || !question) {
+      console.error("Invalid data received for send-question:", { quizCode, question });
       return;
     }
+    
+    //scoring system
+    console.log(`moving to next question`); 
+    currentQuestionIndex++
+    pointsAvailable = 1000
 
-    console.log(`Broadcasting question for quiz ${code}:`, question);
+    console.log(typeof(question)); 
+    console.log(`Broadcasting question for quiz ${quizCode}:`," question",  question);
 
     // Emit the question to all users in the quiz room
-    io.to(code).emit("send-question", { question });
+    io.to(lobbies).emit("send-question", { question });
   });
 
 
   //handling student-response received from StudentQuiz and emitting it
-  socket.on("student-response", ({ code, answer, studentId }) => {
-    if (!code || !answer || !studentId) {
-      console.error("Invalid data received for student-response:", { code, answer, studentId });
+  socket.on("student-response", ({ studentId, questionIndex, answer, isCorrect }) => {
+    console.log(`heard student-response`); 
+    if (!studentId  || !answer || !isCorrect) {
+      console.error("Invalid data received for student-response:", { studentId, questionIndex, answer, isCorrect});
+      return;
+    }
+    let response = { username: socket.username, studentId, questionIndex, answer, isCorrect}
+    console.log(response); 
+
+    //checking if response is for latestquestion (although not necessary cuz we lock answer as soon it is clicked)
+    console.log(`currentQuestionIndex: `, currentQuestionIndex); 
+    console.log(`questionIndex: `, questionIndex); 
+
+    if (questionIndex !== currentQuestionIndex) {
+      console.log("Ignoring response for an old question.");
       return;
     }
 
-    console.log(`Student ${studentId} answered quiz ${code}: ${answer}`);
+    const existingUser = scores.find((user) => user.socketId === studentId);
 
-    // Optionally forward the response to the teacher for real-time updates
-    io.to(code).emit("student-response", { studentId, answer });
+    if (existingUser) {
+      existingUser.finalscore += isCorrect ? pointsAvailable : 0;
+    } else {
+      //new user in array (they never )
+      scores.push({
+        socketId: studentId,
+        username: socket.username,
+        finalscore: isCorrect ? pointsAvailable : 0,
+      });
+    }
+
+    console.log("Updated Scores:", scores);
+    pointsAvailable = Math.max(pointsAvailable - 100, 0); //prevent negative scores
   });
 
 
+  socket.on('quiz-done',()=>{
+    console.log(`quiz-done`); 
 
+    io.to(lobbies).emit("final-score", ({scores}))
+  })
 
 
   socket.on('disconnect', () => {

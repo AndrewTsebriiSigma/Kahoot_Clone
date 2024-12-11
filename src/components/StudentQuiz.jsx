@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import io from "socket.io-client";
 import { getSocket } from "../utils/socket";
 
@@ -7,107 +7,149 @@ import { getSocket } from "../utils/socket";
 function StudentQuiz() {
     const socket = getSocket();
     console.log(`socketId: ${socket.id}`)
-    console.log(`mounted`)
     console.log(`socket connection: `, socket.connected)
     const location = useLocation();
     const quizCode = location.state?.quizCode
     const quizData = location.state?.quizData
 
-    console.log(`quizData received in StudentQuiz:`, quizData)
+    const navigate = useNavigate()
 
-    const [question, setQuestion] = useState(null);
+    console.log(`quizData for ${quizCode} received in StudentQuiz:`, quizData)
+
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [currentQuestion, setCurrentQuestion] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const [isLocked, setIsLocked] = useState(false);
-    const [remainingTime, setRemainingTime] = useState(20);
-    const [correctOption, setCorrectOption] = useState(null);
+    const [isCorrect, setIsCorrect] = useState(false);
 
-
+    //setting first question
     useEffect(() => {
-        console.log(`useEffect ran`)
+        if (quizData && quizData.questions?.length > 0) {
+            setCurrentQuestion(quizData.questions[0]); // Set the first question
+        }
+    }, [quizData]);
 
-        socket.on("send-question", (data) => {
-            console.log("Question received in StudentQuiz:", data);
-            setQuestion(data.question);
-            setSelectedOption(null);
-            setIsLocked(false);
-            setCorrectOption(question.options[question.index]);
+
+    //listening for questions and setting them
+    useEffect(() => {
+        socket.on('send-question', ({ question }) => {
+            setCurrentQuestion(question);
+            setCurrentQuestionIndex((prev) => prev + 1)
+            setSelectedOption(null); // Reset selection for the new question
+            setIsLocked(false); // Unlock for the new question
+            setIsCorrect(false); // Reset correctness
+            console.log('Received question from teacher:', question);
         });
 
         return () => {
-
-            socket.off("send-question");
+            socket.off('send-question');
         };
-    }, []);
+    }, [socket]);
 
-    const handleOptionSelect = (option) => {
-        if (!isLocked) {
-            setSelectedOption(option);
-            setIsLocked(true);
+    //useeffect to navigate to individual scores component
+    useEffect(() => {
+        socket.on("final-score", ({ scores }) => {
+            console.log(`quiz-done in student-quiz and final scores: `, scores)
+            navigate('/student-final-score', {state: {scores}})
+        })
+
+        return () => {
+            socket.off('final-score')
+        }
+    }, [socket, navigate])
 
 
-            socket.emit("student-response", {
-                quizCode,
-                answer: option,
+
+
+
+    const handleOptionSelect = (option, index) => {
+        if (isLocked) return;
+
+        setSelectedOption(index);
+        setIsLocked(true); // Lock selection
+
+        // Check correctness
+        const correctAnswerIndex = currentQuestion.correctAnswer.index;
+        const correct = index === correctAnswerIndex;
+        setIsCorrect(correct);
+
+        if (correct) {
+            // Emit response to server
+            console.log(`emitted`)
+            socket.emit('student-response', {
+                // quizCode,
                 studentId: socket.id,
+                questionIndex: currentQuestionIndex,
+                answer: option,
+                isCorrect: true,
             });
+        } else {
+            console.log('Incorrect answer selected.');
         }
     };
 
-    // Timer logic
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setRemainingTime((prevTime) => prevTime - 1);
-        }, 1000);
-
-        if (remainingTime <= 0) {
-            setIsAllAnswered(true);
-            clearInterval(timer);
-        }
-
-        // Check if all students have answered
-        useEffect(() => {
-            const totalStudents = Object.values(responses).reduce((acc, count) => acc + count, 0);
-            const totalExpectedResponses = quizData[currentQuestionIndex]?.totalStudents || 0;
-
-            if (totalStudents === totalExpectedResponses) {
-                setIsAllAnswered(true);
-                setRemainingTime(0); // Stop timer early if all students have answered
-            }
-        }, [responses, currentQuestionIndex, quizData]);
-
-        return () => clearInterval(timer);
-    }, [remainingTime]);
 
 
-    useEffect(() => {
-        if (selectedOption != null && selectedOption === correctOption) {
-            navigate('/right-answer')
-        } else {
-            navigate('/wrong-answer')
-        }
-    }, []);
+
+    // Timer logic (not implemented for now)
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setRemainingTime((prevTime) => prevTime - 1);
+    //     }, 1000);
+
+    //     if (remainingTime <= 0) {
+    //         setIsAllAnswered(true);
+    //         clearInterval(timer);
+    //     }
+
+    //     // Check if all students have answered
+    //     useEffect(() => {
+    //         const totalStudents = Object.values(responses).reduce((acc, count) => acc + count, 0);
+    //         const totalExpectedResponses = quizData[currentQuestionIndex]?.totalStudents || 0;
+
+    //         if (totalStudents === totalExpectedResponses) {
+    //             setIsAllAnswered(true);
+    //             setRemainingTime(0); // Stop timer early if all students have answered
+    //         }
+    //     }, [responses, currentQuestionIndex, quizData]);
+
+    //     return () => clearInterval(timer);
+    // }, [remainingTime]);
+
+    //will be added later
+    // useEffect(() => {
+    //     if (selectedOption != null && selectedOption === correctOption) {
+    //         navigate('/right-answer')
+    //     } else {
+    //         navigate('/wrong-answer')
+    //     }
+    // }, []);
 
     return (
         <div className="student-quiz">
-            <h2>Quiz: {quizCode}</h2>
-            {question ? (
+            <h2>Quiz Code: {quizCode}</h2>
+            {currentQuestion ? (
                 <>
-                    <h3>{question.question}</h3>
+                    <h3>{currentQuestion.question}</h3>
                     <div className="options">
-                        {question.options.map((option, index) => (
+                        {currentQuestion.options.map((option, index) => (
                             <button
                                 key={index}
-                                onClick={() => handleOptionSelect(option)}
-                                disabled={isLocked} // disables options
+                                onClick={() => handleOptionSelect(option, index)}
+                                disabled={isLocked}
                                 style={{
-                                    backgroundColor: selectedOption === option ? "lightblue" : "",
+                                    backgroundColor: selectedOption === index ? (isCorrect ? 'lightgreen' : 'lightcoral') : '',
                                 }}
                             >
                                 {option}
                             </button>
                         ))}
                     </div>
-                    {isLocked && <p>Your answer has been locked.</p>}
+                    {isLocked && (
+                        <p>
+                            {isCorrect ? 'Correct! 🎉' : 'Incorrect. 😞'}
+                        </p>
+                    )}
                 </>
             ) : (
                 <p>Waiting for the next question...</p>

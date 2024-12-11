@@ -3,9 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
 
-import{getSocket } from "../utils/socket"
-
-
+import { getSocket } from "../utils/socket"
 
 
 
@@ -13,55 +11,63 @@ function TeacherQuiz() {
 
   const socket = getSocket();
   console.log(`socketId: ${socket.id}`)
-  // const { quizCode } = useParams();
-  const [question, setQuestion] = useState(null);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [responses, setResponses] = useState({});
- 
-  const [isAllAnswered, setIsAllAnswered] = useState(false);
-  // const [remainingTime, setRemainingTime] = useState(20);    //removed timer now only for simplicity's sake
-  // const navigate = useNavigate();
-  
- 
-  //h add  (
-
-
+  //h add  
   const location = useLocation();
+  const navigate = useNavigate()
   const quizCode = location.state?.quizCode
   const quizData = location.state?.quizData
 
-  console.log(`state received in TeacherQuiz: `)
   console.log(`quizData received in TeacherQuiz: `, quizData)
+  console.log(`1st question:`, quizData.questions[0].question)
+
+
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(null);
+
 
   
-
+  
+  
+  
   //data received from Lobby in state and here we set first question (data fetching)  (h add)
   useEffect(() => {
-    if (quizData && quizData.length > 0) {
-      setQuestion(quizData[0]); // Automatically send the first question
+    if (quizData && quizData.questions.length > 0) {
+
+      setCurrentQuestion(quizData.questions[0]); // Automatically set the first question
+      socket.emit('send-question', { quizCode, question: quizData.questions[0] });
     }
-  }, [quizData]);
-
-
-  //broadcasting to students first question after fetching data    (h add)
+  }, [quizData, socket, quizCode]);
+  
+  
   useEffect(() => {
-    if (quizData && quizData.length > 0) {
-      socket.emit("send-question", { code: quizCode, question: quizData[0] });
-    }
-  }, [quizData]);
+    console.log(currentQuestion)
+  }, [currentQuestion])
+
 
 
   //nextQuestion button logic (h add)
   const nextQuestion = () => {
     const nextIndex = currentQuestionIndex + 1;
-    if (nextIndex < quizData.length) {
+    if (nextIndex < quizData.questions.length) {
       setCurrentQuestionIndex(nextIndex);
-      setQuestion(quizData[nextIndex]);
-      socket.emit("send-question", { code: quizCode, question: quizData[nextIndex] });
+      setCurrentQuestion(quizData.questions[nextIndex]);
+      socket.emit('send-question', { quizCode, question: quizData.questions[nextIndex] });
     } else {
-      console.log("End of quiz");
+      socket.emit('quiz-done')
     }
   };
+
+  useEffect(() => {
+    socket.on("final-score", ({scores})=>{
+      console.log(`quiz-done received in TeacherQuiz & scores: `, scores)
+      navigate("/final-scoreboard", {state: {scores}})
+    })
+  
+    return () => {
+      socket.off('final-score')
+  }
+  }, [socket, navigate])
+  
 
 
 
@@ -116,18 +122,17 @@ function TeacherQuiz() {
 
   return (
     <div className="teacher-quiz">
-      <h2>Quiz: {quizCode}</h2>
-      {question ? (
+      <h2>Quiz Code: {quizCode}</h2>
+      {currentQuestion ? (
         <>
-          <h3>{question.question}</h3>
+          <h3>{currentQuestion.question}</h3>
           <div className="options">
-            {question.options.map((option, index) => (
+            {currentQuestion.options.map((option, index) => (
               <div key={index}>
                 <p>{option}</p>
               </div>
             ))}
           </div>
-          {/* <p>Time remaining: {remainingTime}s</p> */}
           <button
             disabled={currentQuestionIndex >= quizData.length - 1}
             onClick={nextQuestion}
