@@ -36,125 +36,154 @@ const io = new Server(server, {
   },
 });
 
-let lobbies = {};
+let lobbies;
 
 io.on("connection", (socket) => {
   console.log(`User is connected: ${socket.id}`);
 
-  //quiz lobby creation by the teacher 
-  socket.on('create-quiz-lobby', async (data) => {
-    if (!data || !data.code) {
-      console.error('Invalid data received for create-quiz-lobby:', data);
+  //quiz lobby creation by the teacher (student also joins with this)
+  socket.on('create-quiz-lobby', async ({ quizCode }) => {
+
+    if (!quizCode) {
+      console.error('Invalid data received for create-quiz-lobby:', quizCode);
       return;
     }
 
-    const { code } = data;
-    // console.log(`Quiz lobby created: ${code}`);
 
-    // initialize the lobby if it doesn't exist
-    if (!lobbies[code]) {
-      lobbies[code] = [];
-      console.log(`new lobby created with code ${code}`);
-    }
-    else {
-      console.log(`lobby already exists for code ${code}`);
-    }
+    // initialize the lobby if it doesn't exist (teacher)
+    // if (!lobbies[quizCode]) {
+    //   lobbies[quizCode] = [];
+    //   console.log(`new lobby created with code ${quizCode}`);
+    //   socket.join(quizCode);
+    // }
+    // else {
+    //   console.log(`lobby already exists for code ${quizCode}`);
+    //   socket.join(quizCode);
+    // }
 
-    socket.join(code); // teacher joins the room
+    // lobbies = socket.id;
+    lobbies = quizCode;
+    
+
+    socket.join(lobbies);
+
+
+
+    console.log(`lobbies in teacher: ${lobbies}`);
+    console.log(`Sockets in room ${lobbies}:`, Array.from(io.sockets.adapter.rooms.get(lobbies) || [])); // user joins the room
+
   });
 
-  // player joins the quiz lobby
-  socket.on('join-quiz-lobby', ({ code, nickname }) => {
-    if (!code || !nickname) {
-      console.error('Invalid data received for join-quiz-lobby:', { code, nickname });
+
+
+  // student joins the quiz lobby  
+  socket.on('join-quiz-lobby', ({ quizCode, username }) => {
+    if (!quizCode || !username) {
+      console.error('Invalid data received for join-quiz-lobby:', { quizCode, username });
       return;
     }
 
-    console.log(`Player joined quiz ${code}: ${nickname}`);
-    const playerData = { id: socket.id, nickname };
+    console.log(`Player joined quiz ${quizCode}: ${username}`);
+    // const playerData = { id: socket.id, username };
 
-    if (lobbies[code]) {
-      lobbies[code].push(playerData); // add player to the lobby
-      socket.join(code); // join the room for real-time updates
+    // if (lobbies[quizCode]) {
+    //   // lobbies[quizCode].push(playerData); // add player to the lobby
+    //   socket.join(quizCode); // join the room for real-time updates
 
-      console.log(`Sockets in room ${code}:`, Array.from(io.sockets.adapter.rooms.get(code) || [])); //harsh log
+    //   console.log(`Sockets in room ${quizCode}:`, Array.from(io.sockets.adapter.rooms.get(quizCode) || [])); //harsh log
+
+    //   console.log(`Lobbies in student: ${lobbies}`); 
+    //   console.log(`lobbies.length: ${lobbies.length}`); 
+    //   // notify the teacher and other connected players in the lobby
+    //   io.to(quizCode).emit('player-joined', { username, playerCount: lobbies[quizCode].length });   //harsh, emitting num of players as well
+    // } else {
+    //   // quiz lobby does not exist
+    //   socket.emit('error', { message: 'Quiz lobby does not exist.' });
+    // }
 
 
-      // notify the teacher and other connected players in the lobby
-      io.to(code).emit('player-joined', { playerData, playerCount: lobbies[code].length });   //harsh, emitting num of players as well
-    } else {
-      // quiz lobby does not exist
-      socket.emit('error', { message: 'Quiz lobby does not exist.' });
-    }
+
+
+    socket.join(lobbies)
+    io.to(lobbies).emit('player-joined', { username, playerCount: Array.from(io.sockets.adapter.rooms.get(lobbies)).length });   //harsh, emitting num of players as well
+    console.log(`Sockets in room ${lobbies}:`, Array.from(io.sockets.adapter.rooms.get(lobbies) || [])); // user joins the room
+
+
+
+
+
   });
 
   // start the quiz
-  socket.on('start-quiz', ({ code }) => {
-    if (!code) {
+  socket.on('start-quiz', ({ quizCode, quizData }) => {
+    if (!quizCode) {
       console.error('Quiz code missing for start-quiz event');
       return;
     }
-
-    console.log(`Quiz started for code: ${code}`);
+    
+    console.log(typeof(quizData))
+    console.log(`quizData in socket: ${JSON.stringify(quizData)}`); 
+    
+    console.log(`Quiz started for code: ${quizCode}, lobbies: ${lobbies}`);
     // notify all users in the quiz room
-    io.to(code).emit('quiz-started', { message: 'The quiz has started!' });
+    io.to(lobbies).emit('quiz-started', { message: 'The quiz has started!',quizCode, quizData });
   });
 
   //send student to the lobby
-  socket.on("send_code", async (code) => {
-    console.log("Received quiz code:", code);
-    try {
-      const quiz = await quizzesCollection.findOne({ quizId: Number(code) });
+  // socket.on("send_code", async (code) => {
+  //   console.log("Received quiz code:", code);
+  //   try {
+  //     const quiz = await quizzesCollection.findOne({ quizId: Number(code) });
 
-      if (quiz && quiz.isValid) {
-        socket.emit('checkQuizCode', { isValid: true });
-      } else {
-        socket.emit('checkQuizCode', { isValid: false });
-      }
+  //     if (quiz && quiz.isValid) {
+  //       socket.emit('checkQuizCode', { isValid: true });
+  //     } else {
+  //       socket.emit('checkQuizCode', { isValid: false });
+  //     }
 
 
-      //h add broadcasting data to everyone in room
-      io.to(code).emit("quiz-started", {
-        message: "The quiz has started!",
-        quizData: quiz.questions, // Send only questions
-    });
+  //     //h add broadcasting data to everyone in room
+  //     io.to(code).emit("quiz-started", {
+  //       message: "The quiz has started!",
+  //       quizData: quiz.questions, // Send only questions
+  //     });
 
-    console.log(`Broadcasted quizData to room ${code}`);
-    } catch (err) {
-      console.error("Error querying database:", err);
-      socket.emit('checkQuizCode', { isValid: false });
+  //     console.log(`Broadcasted quizData to room ${code}`);
+  //   } catch (err) {
+  //     console.error("Error querying database:", err);
+  //     socket.emit('checkQuizCode', { isValid: false });
+  //   }
+  // });
+
+
+
+
+  //handling send-question event coming TeacherQuiz and then emitting question to sockets in lobby (to StudentQuiz)   (h add)
+  socket.on("send-question", ({ code, question }) => {
+    if (!code || !question) {
+      console.error("Invalid data received for send-question:", { code, question });
+      return;
     }
+
+    console.log(`Broadcasting question for quiz ${code}:`, question);
+
+    // Emit the question to all users in the quiz room
+    io.to(code).emit("send-question", { question });
   });
 
 
-
-
-//handling send-question event coming TeacherQuiz and then emitting question to sockets in lobby (to StudentQuiz)   (h add)
-socket.on("send-question", ({ code, question }) => {
-  if (!code || !question) {
-      console.error("Invalid data received for send-question:", { code, question });
-      return;
-  }
-
-  console.log(`Broadcasting question for quiz ${code}:`, question);
-
-  // Emit the question to all users in the quiz room
-  io.to(code).emit("send-question", { question });
-});
-
-
-//handling student-response received from StudentQuiz and emitting it
-socket.on("student-response", ({ code, answer, studentId }) => {
-  if (!code || !answer || !studentId) {
+  //handling student-response received from StudentQuiz and emitting it
+  socket.on("student-response", ({ code, answer, studentId }) => {
+    if (!code || !answer || !studentId) {
       console.error("Invalid data received for student-response:", { code, answer, studentId });
       return;
-  }
+    }
 
-  console.log(`Student ${studentId} answered quiz ${code}: ${answer}`);
+    console.log(`Student ${studentId} answered quiz ${code}: ${answer}`);
 
-  // Optionally forward the response to the teacher for real-time updates
-  io.to(code).emit("student-response", { studentId, answer });
-});
+    // Optionally forward the response to the teacher for real-time updates
+    io.to(code).emit("student-response", { studentId, answer });
+  });
 
 
 
@@ -164,14 +193,14 @@ socket.on("student-response", ({ code, answer, studentId }) => {
     console.log('User disconnected:', socket.id);
 
     //remove players from lobby
-    for (const [code, players] of Object.entries(lobbies)) {
-      const index = players.findIndex((player) => player.id === socket.id);
-      if (index !== -1) {
-        players.splice(index, 1); // remove player
-        io.to(code).emit('player-left', { id: socket.id, playerCount: lobbies[code].length });
-        break;
-      }
-    }
+    // for (const [code, players] of Object.entries(lobbies)) {
+    //   const index = players.findIndex((player) => player.id === socket.id);
+    //   if (index !== -1) {
+    //     players.splice(index, 1); // remove player
+    //     io.to(code).emit('player-left', { id: socket.id, playerCount: lobbies[code].length });
+    //     break;
+    //   }
+    // }
   });
 });
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom';
 import io from 'socket.io-client'
 import "./styles/CreateQuiz.css"
@@ -21,22 +21,26 @@ function JoinPage() {
 
 
 
-    //new joinQuiz which emits join-quiz-lobby which actually adds user to the lobby
-
+    //new joinQuiz which emits join-quiz-lobby which actually adds user to the lobby (added in useEffect)
+    // useEffect(() => {
+    //     let socket;//to prevent new socket everytime
+    //     // Create a single socket connection if not already connected
+    //     if (!socket) {
+    //         socket = useMemo(() => io.connect(socketUrl), []);
+    //     }
+    
+    // }, [])
+    
     const joinQuiz = () => {
-        let socket;//to prevent new socket everytime
-        // Create a single socket connection if not already connected
-        if (!socket) {
-            socket = io.connect(socketUrl);
-        }
+       
 
-        socket.emit("send_code", Number(code));
+        // socket.emit("send_code", Number(code));
 
-        socket.on('checkQuizCode', (response) => {
-            if (response.isValid) {
+        // socket.on('checkQuizCode', (response) => {
+            // if (response.isValid) {
                 // Emit 'join-quiz-lobby' before navigating
-                socket.emit('join-quiz-lobby', { code: Number(code), nickname });
-
+                // socket.emit('join-quiz-lobby', { code: Number(code), nickname });    //not needed in here
+                console.log(`navigating to lobby from Join Page with state ${code, nickname}`)
                 navigate("/lobby", {
                     state: {
                         quizCode: code,
@@ -44,10 +48,10 @@ function JoinPage() {
                         role: "student",
                     },
                 });
-            } else {
-                setError('Invalid quiz code!');
-            }
-        });
+            // } else {
+                // setError('Invalid quiz code!');
+            // }
+        // });
     };
 
     

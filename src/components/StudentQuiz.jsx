@@ -1,13 +1,20 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import io from "socket.io-client";
+import { getSocket } from "../utils/socket";
 
-const socket = io.connect(import.meta.env.VITE_BE_SOCKET);
 
 function StudentQuiz() {
+    const socket = getSocket();
+    console.log(`socketId: ${socket.id}`)
     console.log(`mounted`)
     console.log(`socket connection: `, socket.connected)
-    const { quizCode } = useParams(); 
+    const location = useLocation();
+    const quizCode = location.state?.quizCode
+    const quizData = location.state?.quizData
+
+    console.log(`quizData received in StudentQuiz:`, quizData)
+
     const [question, setQuestion] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const [isLocked, setIsLocked] = useState(false);
@@ -17,17 +24,17 @@ function StudentQuiz() {
 
     useEffect(() => {
         console.log(`useEffect ran`)
-        
+
         socket.on("send-question", (data) => {
             console.log("Question received in StudentQuiz:", data);
             setQuestion(data.question);
-            setSelectedOption(null); 
+            setSelectedOption(null);
             setIsLocked(false);
             setCorrectOption(question.options[question.index]);
         });
 
         return () => {
-            
+
             socket.off("send-question");
         };
     }, []);
@@ -35,41 +42,41 @@ function StudentQuiz() {
     const handleOptionSelect = (option) => {
         if (!isLocked) {
             setSelectedOption(option);
-            setIsLocked(true); 
+            setIsLocked(true);
 
-            
+
             socket.emit("student-response", {
                 quizCode,
                 answer: option,
-                studentId: socket.id, 
+                studentId: socket.id,
             });
         }
     };
 
     // Timer logic
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setRemainingTime((prevTime) => prevTime - 1);
-    }, 1000);
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setRemainingTime((prevTime) => prevTime - 1);
+        }, 1000);
 
-    if (remainingTime <= 0) {
-      setIsAllAnswered(true);
-      clearInterval(timer);
-    }
+        if (remainingTime <= 0) {
+            setIsAllAnswered(true);
+            clearInterval(timer);
+        }
 
-    // Check if all students have answered
-  useEffect(() => {
-    const totalStudents = Object.values(responses).reduce((acc, count) => acc + count, 0);
-    const totalExpectedResponses = quizData[currentQuestionIndex]?.totalStudents || 0;
+        // Check if all students have answered
+        useEffect(() => {
+            const totalStudents = Object.values(responses).reduce((acc, count) => acc + count, 0);
+            const totalExpectedResponses = quizData[currentQuestionIndex]?.totalStudents || 0;
 
-    if (totalStudents === totalExpectedResponses) {
-      setIsAllAnswered(true);
-      setRemainingTime(0); // Stop timer early if all students have answered
-    }
-  }, [responses, currentQuestionIndex, quizData]);
+            if (totalStudents === totalExpectedResponses) {
+                setIsAllAnswered(true);
+                setRemainingTime(0); // Stop timer early if all students have answered
+            }
+        }, [responses, currentQuestionIndex, quizData]);
 
-    return () => clearInterval(timer);
-  }, [remainingTime]);
+        return () => clearInterval(timer);
+    }, [remainingTime]);
 
 
     useEffect(() => {

@@ -3,53 +3,37 @@ import { useNavigate, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import { useLocation } from 'react-router-dom';
 
+import{getSocket } from "../utils/socket"
 
 
-const socket = io.connect(import.meta.env.VITE_BE_SOCKET);
+
+
 
 function TeacherQuiz() {
+
+  const socket = getSocket();
+  console.log(`socketId: ${socket.id}`)
   // const { quizCode } = useParams();
   const [question, setQuestion] = useState(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [responses, setResponses] = useState({});
-  // const [quizData, setQuizData] = useState([]);
+ 
   const [isAllAnswered, setIsAllAnswered] = useState(false);
   // const [remainingTime, setRemainingTime] = useState(20);    //removed timer now only for simplicity's sake
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   
  
   //h add  (
-  const { state } = useLocation();
-  const { quizCode, quizData } = state;
 
-  console.log(`state received in TeacherQuiz: `, state)
+
+  const location = useLocation();
+  const quizCode = location.state?.quizCode
+  const quizData = location.state?.quizData
+
+  console.log(`state received in TeacherQuiz: `)
   console.log(`quizData received in TeacherQuiz: `, quizData)
 
-  // fetch the quiz data (socket based data fetching)
-  // useEffect(() => {
-  //   socket.emit('get-quiz-data', { quizCode });
-  //   socket.on('quiz-data', (data) => {
-  //     if (data && data.questions) {
-  //       const formattedQuestions = data.questions.map((q) => ({
-  //         question: q.question || '',
-  //         options: q.options || [],
-  //       }));
-
-  //       setQuizData(formattedQuestions);
-  //       setQuestion(formattedQuestions[0]); // get the first question
-  //       setRemainingTime(20); // Start the timer for the first question
-  //     } else {
-  //       console.error('Quiz data is empty or malformed.');
-  //     }
-  //   });
-
-  //   return () => {
-  //     socket.off('quiz-data');
-  //   };
-  // }, [quizCode]);
-
-
-
+  
 
   //data received from Lobby in state and here we set first question (data fetching)  (h add)
   useEffect(() => {
