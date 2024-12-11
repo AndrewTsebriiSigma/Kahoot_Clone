@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Login from './Components/Login.jsx'
 import Registration from './Components/Registration.jsx'
-import Quizzes from './Components/Quizzes.jsx'
+import Quizzes from './components/Quizzes.jsx'
 import CreateQuiz from './Components/CreateQuiz.jsx'
 import JoinPage from './Components/JoinPage.jsx'
 import Lobby from './Components/Lobby.jsx'
@@ -10,14 +10,26 @@ import PassRandomQuizDasboard from './components/PassRandomQuizDashboard.jsx';
 import PassRandomQuizSetup from './Components/PassRandomQuizSetup.jsx';
 import PassRandomQuiz from './components/PassRandomQuizDashboard.jsx';
 import PassRandomQuizResults from './Components/PassRandomQuizResults.jsx';
-import StudentQuiz from './Components/StudentQuiz.jsx';
+import StudentQuiz from './components/StudentQuiz.jsx';
 import TeacherQuiz from './Components/TeacherQuiz.jsx';
 import RightAnswer from './Components/RightAnswer.jsx';
 import WrongAnswer from './Components/WrongAnswer.jsx';
 import StudentFinalScore from './Components/StudentFinalScore.jsx';
-import FinalScoreboard from './Components/FinalScoreboard.jsx';
+import FinalScoreboard from './components/FinalScoreboard.jsx';
+
+//Delete this when actual data is in
+const mockScores = [
+  { name: "Alice", finalScore: 4500 },
+  { name: "Bob", finalScore: 3800 },
+  { name: "Charlie", finalScore: 3200 },
+  { name: "Dave", finalScore: 2900 },
+  { name: "Eve", finalScore: 2700 },
+];
 
 function App() {
+
+  console.log(mockScores);
+
   return (
     <>
       <Router>
@@ -39,7 +51,8 @@ function App() {
             <Route path="/right-answer" element={<RightAnswer/>}/>
             <Route path="/wrong-answer" element={<WrongAnswer/>}/>
             <Route path="/student-final-score" element={<StudentFinalScore/>}/>
-            <Route path="/final-scoreboard" element={<FinalScoreboard/>}/>
+            <Route path="/final-scoreboard" element={<FinalScoreboard scores={mockScores} />} />
+
           </Routes>
         </div>
       </Router>

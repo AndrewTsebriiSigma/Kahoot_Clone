@@ -1,27 +1,65 @@
+.bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.bar-wrapper {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.bar-info {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.rank,
+.name,
+.score {
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.rank {
+  color: #000000;
+}
+
+.name {
+  flex-grow: 1;
+  text-align: left;
+  margin-left: 10px;
+}
+
+.score {
+  text-align: right;
+}
+
+.bar {
+  height: 20px; /* Adjust the height as needed */
+  background-color: #4CAF50; /* Default color for bars */
+  width: 100%;
+}
+
 .leaderboard-container {
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .leaderboard-table {
-    margin: 20px auto;
-    border-collapse: collapse;
-    width: 60%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  .leaderboard-table th, .leaderboard-table td {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
-  }
-  
-  .leaderboard-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
-  .leaderboard-table tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
+  width: 100%;
+  padding: 20px;
+}
+
+/* Custom colors for top 3 ranks */
+.bar-wrapper:nth-child(1) .bar {
+  background-color: #ffd700; /* Gold for 1st place */
+}
+
+.bar-wrapper:nth-child(2) .bar {
+  background-color: #c0c0c0; /* Silver for 2nd place */
+}
+
+.bar-wrapper:nth-child(3) .bar {
+  background-color: #cd7f32; /* Bronze for 3rd place */
+}
