@@ -1,4 +1,4 @@
-import React, { useMemo, useLocation } from 'react';
+import React, { useMemo } from 'react';
 import './styles/Leaderboard.css';
 import { useLocation } from 'react-router-dom';
 
@@ -6,7 +6,6 @@ const FinalScoreboard = () => {
   const location = useLocation()
   const scores = location.state?.scores;
 
-  // const scoresFromProps = useMemo(() => scores || [], [scores]);
 
   const topThree = useMemo(() => {
     return [...scores]

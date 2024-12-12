@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import io from "socket.io-client";
 import { QRCodeCanvas } from "qrcode.react";
-
+import "./styles/Lobby.css"
 //h add singleton connection
 import { getSocket } from "../utils/socket"
 let socket;
@@ -57,14 +57,31 @@ function Lobby() {
 
 
     useEffect(() => {
-        socket.on("player-joined", ({ username, playerCount }) => {
-            console.log(`player join received by client socket id: ${socket.id}:`, username, playerCount);
-            setPlayers((prevPlayers) => {
-                console.log(players)
-                return [...prevPlayers, username];
-            });
-            setPlayerCounter(playerCount)
-        });
+        // socket.on("player-joined", ({ username, playerCount }) => {
+            // console.log(`player join received by client socket id: ${socket.id}:`, username, playerCount);
+            // setPlayers((prevPlayers) => {
+            //     console.log(players)
+            //     return [...prevPlayers, username];
+            // });
+            // setPlayerCounter(playerCount)
+
+            // });
+            const handlePlayerJoined = ({username, playerCount })=>{
+                console.log(`player joined received in client socketId: `, username, playerCount)
+
+                setPlayers((prevPlayers)=>{
+                    if(!prevPlayers.includes(username)){
+                        return[...prevPlayers, username];
+                    }
+                    return prePlayers;
+                })
+                setPlayerCounter(playerCount)
+            }
+
+            socket.on("player-joined", handlePlayerJoined);
+            return () => {
+                socket.off("player-joined", handlePlayerJoined);
+            };
 
     }, [playerCounter])
 
@@ -107,7 +124,7 @@ function Lobby() {
     //useEffect that makes start quiz button available
     useEffect(() => {
         console.log("role", role, "playercount", playerCounter)
-        setButtonAvailable(role === "teacher" || playerCounter > 0);
+        setButtonAvailable(role === "teacher" && playerCounter > 0);
     }, [role, playerCounter]);
 
 
