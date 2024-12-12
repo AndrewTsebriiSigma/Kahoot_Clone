@@ -1,8 +1,10 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useLocation } from 'react';
 import './styles/Leaderboard.css';
 
-const FinalScoreboard = ({ scores }) => {
+const FinalScoreboard = () => {
+  const scores = location.state?.scores;
   const scoresFromProps = useMemo(() => scores || [], [scores]);
+  const location = useLocation();
 
   const topThree = useMemo(() => {
     return [...scoresFromProps]
