@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useLocation } from 'react';
 import './styles/Leaderboard.css';
 import { useLocation } from 'react-router-dom';
 

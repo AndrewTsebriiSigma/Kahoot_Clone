@@ -8,7 +8,7 @@ import JoinPage from './Components/JoinPage.jsx'
 import Lobby from './Components/Lobby.jsx'
 import PassRandomQuizDasboard from './components/PassRandomQuizDashboard.jsx';
 import PassRandomQuizSetup from './Components/PassRandomQuizSetup.jsx';
-import PassRandomQuiz from './components/PassRandomQuizDashboard.jsx';
+import PassRandomQuiz from './components/PassRandomQuiz.jsx';
 import PassRandomQuizResults from './Components/PassRandomQuizResults.jsx';
 import StudentQuiz from './components/StudentQuiz.jsx';
 import TeacherQuiz from './Components/TeacherQuiz.jsx';
@@ -27,9 +27,6 @@ import FinalScoreboard from './components/FinalScoreboard.jsx';
 // ];
 
 function App() {
-
-  // console.log(mockScores);
-
   return (
     <>
       <Router>
