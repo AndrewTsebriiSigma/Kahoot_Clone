@@ -18,17 +18,17 @@ import StudentFinalScore from './Components/StudentFinalScore.jsx';
 import FinalScoreboard from './components/FinalScoreboard.jsx';
 
 //Delete this when actual data is in
-const mockScores = [
-  { name: "Alice", finalScore: 4500 },
-  { name: "Bob", finalScore: 3800 },
-  { name: "Charlie", finalScore: 3200 },
-  { name: "Dave", finalScore: 2900 },
-  { name: "Eve", finalScore: 2700 },
-];
+// const mockScores = [
+//   { name: "Alice", finalScore: 4500 },
+//   { name: "Bob", finalScore: 3800 },
+//   { name: "Charlie", finalScore: 3200 },
+//   { name: "Dave", finalScore: 2900 },
+//   { name: "Eve", finalScore: 2700 },
+// ];
 
 function App() {
 
-  console.log(mockScores);
+  // console.log(mockScores);
 
   return (
     <>
@@ -51,7 +51,7 @@ function App() {
             <Route path="/right-answer" element={<RightAnswer/>}/>
             <Route path="/wrong-answer" element={<WrongAnswer/>}/>
             <Route path="/student-final-score" element={<StudentFinalScore/>}/>
-            <Route path="/final-scoreboard" element={<FinalScoreboard scores={mockScores} />} />
+            <Route path="/final-scoreboard" element={<FinalScoreboard />} />
 
           </Routes>
         </div>
