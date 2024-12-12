@@ -43,7 +43,7 @@ function StudentQuiz() {
 
         return () => {
             socket.off('send-question');
-        };
+        };  
     }, [socket]);
 
     //useeffect to navigate to individual scores component

@@ -1,0 +1,9 @@
+.studentScore {
+    text-align: center;
+    background-color: rgb(65, 215, 65);
+    padding: 40px;
+};
+
+.score {
+    color: white;
+}
