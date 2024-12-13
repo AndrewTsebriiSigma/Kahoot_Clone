@@ -42,6 +42,12 @@ Student view after teacher start quiz
 ![image](https://github.com/user-attachments/assets/bbf0a40e-3344-488b-bac9-90d36d592df5)
 Final Lobby for Teacher with one joined student
 ![Final Lobby for Teacher with one joined student](image-6.png)
+Student view of the quiz after start
+![Student view of the quiz after start](image-7.png)
+Top 3 students for Teacher view
+![Top 3 students for Teacher view](image-9.png)
+Student view after quiz is done
+![Student view after quiz is done](image-10.png)
 
 
 ## Instructions to run in the repository
