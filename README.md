@@ -3,18 +3,21 @@
 ## Instructions with the deployed project
 - Open [https://kahoot-clonee.onrender.com/](https://kahoot-clonee.onrender.com)
 - Create an account as a teacher
-  - Login into this account
-  - In Quizzes page, feel free to create a new quiz, or update existing quizzes or delete a quiz
-  - Click on "Start" button, and it will go to the lobby page.
-  - The lobby page show the quiz code and a QRCode (not yet working)
+- Login into this account
+- In Quizzes page, feel free to create a new quiz, or update existing quizzes or delete a quiz
+- Click on "Start" button, and it will go to the lobby page.
+- The lobby page show the quiz code and a QRCode
 - On another browser, create an account as a student 
-  - Login into this account
-  - Type the quiz code (qr code not working yet) provided by the teacher lobby and a username
-  - Click on "Join Quiz" button
-- After, go back to the teacher browser to that the number of Players updated and click on "Start Quiz"
-- Teacher page will show the first question and Next Question button (working)
-- Student page will NOT work correctly since we are still working on it.
-
+- Login into this account
+- Type the quiz code provided by the teacher lobby and a username
+- Click on "Join Quiz" button
+- Repeat previous 4 steps as many times as you want number of times (up to 15 recommended)
+- As a teacher, click "Start Quiz" button
+- As a student, answer on the displayed question
+- As a teacher, after all students answered, click "Next Question" button
+- Repeat last two steps till the end of the quiz
+- After all questions are gone, teacher will see top 3 students with the highest scores
+- Each student will see own nickname and the own score
 ## Screenshots and decriptions
 Login page where the user clicks on "Create" to create the teacher or student account
 ![Login page where the user clicks on "Create" to create the teacher or student account](image.png)
